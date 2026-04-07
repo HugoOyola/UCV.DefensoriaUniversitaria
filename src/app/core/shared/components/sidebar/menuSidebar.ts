@@ -1,4 +1,5 @@
 export interface MenuSidebar {
+	id: string;
 	name: string;
 	icon: string;
 	path?: string;

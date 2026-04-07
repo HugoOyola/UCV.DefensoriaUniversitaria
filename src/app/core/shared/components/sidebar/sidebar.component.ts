@@ -37,7 +37,7 @@ export class SidebarComponent {
 	abrirMenu(MenuSidebar: MenuSidebar): void {
 		if (MenuSidebar.view) {
 			console.log(' =>');
-			const menu = this.menuSidebarShow().find((menu) => menu.name === MenuSidebar.name);
+			const menu = this.menuSidebarShow().find((menu) => menu.id === MenuSidebar.id);
 			if (menu) {
 				menu.view = false;
 			}
@@ -47,7 +47,7 @@ export class SidebarComponent {
 					return {...menu, view: false};
 				});
 			});
-			const menu = this.menuSidebarShow().find((menu) => menu.name === MenuSidebar.name);
+			const menu = this.menuSidebarShow().find((menu) => menu.id === MenuSidebar.id);
 			if (menu) {
 				menu.view = true;
 			}
@@ -57,7 +57,7 @@ export class SidebarComponent {
 		if (MenuSidebarchildrem.childrem !== undefined) {
 			if (MenuSidebarchildrem.view) {
 				console.log(' =>');
-				const menu = this.menuSidebarShow().find((menu) => menu.name === MenuSidebar.name);
+				const menu = this.menuSidebarShow().find((menu) => menu.id === MenuSidebar.id);
 				const menuchildrem = menu?.childrem?.find((menuchildrem) => menuchildrem.name === MenuSidebarchildrem.name);
 
 				if (menuchildrem) {
@@ -74,7 +74,7 @@ export class SidebarComponent {
 						};
 					});
 				});
-				const menu = this.menuSidebarShow().find((menu) => menu.name === MenuSidebar.name);
+				const menu = this.menuSidebarShow().find((menu) => menu.id === MenuSidebar.id);
 				const menuchildrem = menu?.childrem?.find((menuchildrem) => menuchildrem.name === MenuSidebarchildrem.name);
 				if (menuchildrem) {
 					menuchildrem.view = true;
