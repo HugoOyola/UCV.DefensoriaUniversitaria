@@ -1,110 +1,109 @@
-import {MenuSidebar, MenuSidebarFooter} from '@shared/components/sidebar/menuSidebar';
+import { MenuSidebar, MenuSidebarFooter } from '@shared/components/sidebar/menuSidebar';
 export const Sidebar: MenuSidebar[] = [
 	{
-		name: 'Dashboard de la Dashboard con Dashboard Dashboard',
+		id: 'inicio',
+		name: 'Inicio',
 		icon: 'home',
-		// path: '/uikit',
+		path: '/inicio',
 		action: (): void => {
-			console.log('Dashboard');
+			console.log('Inicio');
 		},
-		childrem: [
-			{
-				name: 'Dashboard',
-				path: '/uikit',
-
-				action: (): void => {
-					console.log('Dashboard');
-				},
-			},
-			{
-				name: 'Matricula',
-				action: (): void => {
-					console.log('Dashboard');
-				},
-				childrem: [
-					{
-						name: 'Dashboard',
-						action: (): void => {
-							console.log('Dashboard');
-						},
-					},
-					{
-						name: 'Datos Básicos',
-
-						action: (): void => {
-							console.log('Dashboard');
-						},
-					},
-				],
-			},
-			{
-				name: 'Matricula2',
-				action: (): void => {
-					console.log('Dashboard');
-				},
-				childrem: [
-					{
-						name: 'Dashboard',
-						action: (): void => {
-							console.log('Dashboard');
-						},
-					},
-					{
-						name: 'Datos Básicos',
-
-						action: (): void => {
-							console.log('Dashboard');
-						},
-					},
-				],
-			},
-		],
 	},
 	{
-		name: 'Matricula',
-		icon: '360',
-		path: '/',
+		id: 'monitoreo-denuncias-reclamos',
+		name: 'Monitoreo de Denuncia / Reclamos',
+		icon: 'clipboard-list',
+		path: '/modulo',
 		action: (): void => {
-			console.log('Dashboard');
+			console.log('Monitoreo de Denuncia / Reclamos');
 		},
 		childrem: [
 			{
-				name: 'Dashboard',
+				name: 'Todas',
+				path: '/modulo',
 				action: (): void => {
-					console.log('Dashboard');
+					console.log('Todas');
 				},
 			},
 			{
-				name: 'Matricula',
+				name: 'Por Revisar',
+				path: '/modulo',
 				action: (): void => {
-					console.log('Dashboard');
+					console.log('Por Revisar');
+				},
+			},
+			{
+				name: 'En Proceso',
+				path: '/modulo',
+				action: (): void => {
+					console.log('En Proceso');
+				},
+			},
+			{
+				name: 'Resueltas',
+				path: '/modulo',
+				action: (): void => {
+					console.log('Resueltas');
 				},
 			},
 		],
 	},
 	{
-		name: 'Registro de Licencia',
-		icon: '360',
-		path : '/licencia',
+		id: 'estadisticas',
+		name: 'Estadisticas',
+		icon: 'chart-bar',
+		path: '/uikit',
 		action: (): void => {
-			console.log('licencia');
+			console.log('Estadisticas');
+		},
+	},
+	{
+		id: 'reportes-1',
+		name: 'Reportes',
+		icon: 'report-analytics',
+		action: (): void => {
+			console.log('Reportes');
+		},
+	},
+	{
+		id: 'gestion-usuario',
+		name: 'Gestion de Usuario',
+		icon: 'users',
+		action: (): void => {
+			console.log('Gestion de Usuario');
+		},
+	},
+	{
+		id: 'reportes-2',
+		name: 'Reportes',
+		icon: 'file-description',
+		action: (): void => {
+			console.log('Reportes');
+		},
+	},
+	{
+		id: 'configuracion',
+		name: 'Configuración',
+		icon: 'settings',
+		action: (): void => {
+			console.log('Configuración');
 		},
 	},
 ];
 export const SidebarFooter: MenuSidebarFooter[] = [
-	{
-		name: 'Dashboard',
-		icon: 'home',
-		path: '/uikit',
-		action: (): void => {
-			console.log('Dashboard');
-		},
-	},
-	{
-		name: 'Matricula',
-		icon: 'toggle-right',
-		action: (): void => {
-			console.log('Dashboard');
-		},
-	},
+	// {
+	// 	name: 'Dashboard',
+	// 	icon: 'home',
+	// 	path: '/uikit',
+	// 	action: (): void => {
+	// 		console.log('Dashboard');
+	// 	},
+	// },
+	// {
+	// 	name: 'Matricula',
+	// 	icon: 'toggle-right',
+	// 	action: (): void => {
+	// 		console.log('Dashboard');
+	// 	},
+	// },
 ];

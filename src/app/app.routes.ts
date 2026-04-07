@@ -1,6 +1,8 @@
 import {Routes} from '@angular/router';
 import {ModulosComponent} from './page/module/modulos.component';
 import {MainComponent} from './page/main/main.component';
+import { DatosBasicosComponent } from './page/main/components/datos-basicos/datos-basicos.component';
+import {InicioComponent} from './page/main/components/inicio/inicio.component';
 
 export const routes: Routes = [
 	{
@@ -10,8 +12,18 @@ export const routes: Routes = [
 		title: 'Modulo Datos - Principal',
 		children: [
 			{
+				path: '',
+				pathMatch: 'full',
+				redirectTo: 'inicio',
+			},
+			{
+				path: 'inicio',
+				component: InicioComponent,
+				title: 'Inicio',
+			},
+			{
 				path: 'modulo',
-				component: ModulosComponent,
+				component: DatosBasicosComponent,
 				// loadComponent: () => import('./page/main/main.component').then((m) => m.MainComponent),
 				title: 'Modulo Datos - Principal',
 			},
