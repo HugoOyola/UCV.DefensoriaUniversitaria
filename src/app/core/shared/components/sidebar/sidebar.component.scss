@@ -1,0 +1,52 @@
+.tooltip {
+	visibility: hidden;
+	background-color: var(--accent);
+	color: #fff;
+	text-align: center;
+	border-radius: 8px;
+	padding: 5px 8px;
+	position: absolute;
+	z-index: 1;
+	left: 90%;
+	font-size: 13px;
+	opacity: 0;
+	transition: opacity 0.3s;
+	// white-space: nowrap;
+	// line-clamp: 50;
+	width: 130px;
+	max-width: 30ch;
+	overflow-wrap: break-word;
+	&::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: -10px;
+		margin-top: -5px;
+		border-width: 5px;
+		border-style: solid;
+		border-color: transparent var(--accent) transparent transparent;
+	}
+}
+
+/* Cuando el mouse pasa sobre el elemento padre, se muestra el tooltip */
+.navbar-item:hover .tooltip {
+	visibility: visible;
+	opacity: 1;
+	animation: fadeInOut 1.5s forwards;
+	-webkit-animation: fadeInOut 1.5s forwards;
+}
+
+@keyframes fadeInOut {
+	0% {
+		visibility: visible;
+		opacity: 1;
+	}
+	80% {
+		visibility: visible;
+		opacity: 1;
+	}
+	100% {
+		visibility: hidden;
+		opacity: 0;
+	}
+}
