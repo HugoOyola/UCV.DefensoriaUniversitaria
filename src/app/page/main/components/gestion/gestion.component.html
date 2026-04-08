@@ -250,4 +250,8 @@
       </div>
     </ng-template>
   </p-card>
+
+  <app-gestion-modales [detalleVisible]="mostrarModalDetalle()" [complaint]="complaintSeleccionado()"
+    (detalleVisibleChange)="onDetalleVisibleChange($event)">
+  </app-gestion-modales>
 </section>

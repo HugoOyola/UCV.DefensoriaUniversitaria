@@ -1,0 +1,95 @@
+<app-modal [visible]="detalleVisible()" (visibleChange)="onDetalleVisibleChange($event)" [title]="detalleModalTitle()"
+  [subtitle]="detalleModalSubtitle()" [badge]="detalleModalBadge()" icon="pi pi-file-edit" [dialogWidth]="'70rem'"
+  [maximizable]="true" [dismissableMask]="true" [closable]="true">
+  @if (complaint(); as currentComplaint) {
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div class="rounded-2xl border border-solid border-slate-200 bg-slate-50 p-4">
+      <h4 class="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Datos del denunciante</h4>
+      <div class="space-y-2 text-sm text-slate-700">
+        <p><span class="font-semibold text-slate-900">Nombre:</span> {{ currentComplaint.nombre }} {{
+          currentComplaint.apellidos }}</p>
+        <p><span class="font-semibold text-slate-900">Tipo de usuario:</span> {{
+          getTipoUsuarioLabel(currentComplaint.tipoUsuario)
+          }}</p>
+        <p><span class="font-semibold text-slate-900">Documento:</span> {{ currentComplaint.documento }}</p>
+        <p><span class="font-semibold text-slate-900">Correo:</span> {{ currentComplaint.email }}</p>
+        <p><span class="font-semibold text-slate-900">Teléfono:</span> {{ currentComplaint.telefono }}</p>
+        <p><span class="font-semibold text-slate-900">Domicilio:</span> {{ currentComplaint.domicilio }}</p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-solid border-slate-200 bg-slate-50 p-4">
+      <h4 class="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Datos del caso</h4>
+      <div class="space-y-2 text-sm text-slate-700">
+        <p><span class="font-semibold text-slate-900">Expediente:</span> {{ currentComplaint.expediente }}</p>
+        <p><span class="font-semibold text-slate-900">Fecha:</span> {{ currentComplaint.fecha | date: 'dd/MM/yyyy HH:mm'
+          }}</p>
+        <p><span class="font-semibold text-slate-900">Estado:</span> {{ currentComplaint.estado }}</p>
+        <p><span class="font-semibold text-slate-900">Prioridad:</span> {{ currentComplaint.prioridad }}</p>
+        <p><span class="font-semibold text-slate-900">Asignado a:</span> {{ currentComplaint.asignado || 'Sin asignar'
+          }}</p>
+        <p><span class="font-semibold text-slate-900">Filial:</span> {{ currentComplaint.filial || 'No especificada' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-solid border-slate-200 bg-white p-4 lg:col-span-2">
+      <h4 class="mb-2 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Descripción</h4>
+      <div class="grid gap-4 lg:grid-cols-2">
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 p-3">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">Expone</p>
+          <p class="whitespace-pre-wrap text-sm text-slate-800">{{ currentComplaint.expone }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 p-3">
+          <p class="mb-1 text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">Solicita</p>
+          <p class="whitespace-pre-wrap text-sm text-slate-800">{{ currentComplaint.solicita }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-solid border-slate-200 bg-white p-4 lg:col-span-2">
+      <h4 class="mb-2 text-sm font-bold uppercase tracking-[0.14em] text-slate-500">Derivación previa y adjuntos</h4>
+
+      <div class="mb-3 flex flex-wrap gap-2">
+        @for (area of getAreasPrevias(currentComplaint); track area) {
+        <span
+          class="inline-flex items-center rounded-full border border-solid border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+          {{ area }}
+        </span>
+        }
+
+        @if (getAreasPrevias(currentComplaint).length === 0) {
+        <span class="text-sm text-slate-500">No se registró ingreso en otra área.</span>
+        }
+      </div>
+
+      <div class="space-y-2">
+        @if (currentComplaint.adjuntos && currentComplaint.adjuntos.length > 0) {
+        @for (adjunto of currentComplaint.adjuntos; track adjunto.nombre) {
+        <div
+          class="flex items-center justify-between rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <span class="text-sm text-slate-800">
+            <i class="pi pi-paperclip mr-2 text-slate-500"></i>{{ adjunto.nombre }}
+          </span>
+          @if (adjunto.url) {
+          <a [href]="adjunto.url" target="_blank" rel="noopener"
+            class="text-sm font-medium text-slate-700 underline decoration-slate-400 underline-offset-4 hover:text-slate-900">
+            Ver
+          </a>
+          }
+        </div>
+        }
+        } @else {
+        <p class="text-sm text-slate-500">No hay adjuntos en este registro.</p>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+  <div modal-footer>
+    <p-button label="Cerrar" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="closeDetalle()">
+    </p-button>
+  </div>
+</app-modal>

@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { GestionModalesComponent } from '@app/page/main/components/gestion/modales/gestion-modales.component';
 import { MainService } from '../../services/main.service';
 import {
   Denuncia,
@@ -43,6 +44,7 @@ type PrioridadUi = {
     SelectModule,
     TableModule,
     TooltipModule,
+    GestionModalesComponent,
   ],
   templateUrl: './gestion.component.html',
   styleUrl: './gestion.component.scss',
@@ -216,8 +218,11 @@ export class GestionComponent {
     this.mostrarModalDetalle.set(true);
   }
 
-  cerrarModal(): void {
-    this.mostrarModalDetalle.set(false);
+  onDetalleVisibleChange(value: boolean): void {
+    this.mostrarModalDetalle.set(value);
+    if (!value) {
+      this.complaintSeleccionado.set(null);
+    }
   }
 
   responderComplaint(complaint: Denuncia): void {
