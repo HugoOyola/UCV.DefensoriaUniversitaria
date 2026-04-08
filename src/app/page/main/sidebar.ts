@@ -13,35 +13,35 @@ export const Sidebar: MenuSidebar[] = [
 		id: 'monitoreo-denuncias-reclamos',
 		name: 'Gestión Denuncias / Reclamos',
 		icon: 'clipboard-list',
-		path: '/modulo',
+		path: '/gestion',
 		action: (): void => {
 			console.log('Gestión Denuncias / Reclamos');
 		},
 		childrem: [
 			{
 				name: 'Todas',
-				path: '/modulo',
+				path: '/gestion',
 				action: (): void => {
 					console.log('Todas');
 				},
 			},
 			{
 				name: 'Por Revisar',
-				path: '/modulo',
+				path: '/gestion',
 				action: (): void => {
 					console.log('Por Revisar');
 				},
 			},
 			{
 				name: 'En Proceso',
-				path: '/modulo',
+				path: '/gestion',
 				action: (): void => {
 					console.log('En Proceso');
 				},
 			},
 			{
 				name: 'Resueltas',
-				path: '/modulo',
+				path: '/gestion',
 				action: (): void => {
 					console.log('Resueltas');
 				},
