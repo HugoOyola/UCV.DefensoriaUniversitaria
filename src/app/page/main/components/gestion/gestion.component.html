@@ -1,14 +1,18 @@
-<!-- Contenido -->
-<div class="w-full p-6">
-  <p-card class="transition-all duration-300 shadow-lg hover:shadow-xl">
+<section class="bg-slate-100 px-6 py-4">
+  <p-card class="overflow-hidden rounded-3xl border border-solid border-slate-200 bg-white shadow-sm">
     <ng-template pTemplate="header">
-      <div class="flex items-center gap-3 p-4 border-b bg-[#ddeaf3]">
-        <div class="flex items-center justify-center w-10 h-10 rounded-lg shadow-md bg-[#105282]">
-          <i class="text-lg text-white pi pi-users"></i>
+      <div
+        class="flex items-center gap-4 border-b border-0 border-solid border-slate-800 bg-slate-800 px-5 py-5 md:px-6 md:py-6">
+        <div
+          class="flex h-11 w-11 items-center justify-center rounded-2xl border border-solid border-slate-500 bg-slate-600">
+          <i class="pi pi-users text-lg text-slate-100"></i>
         </div>
+
         <div>
-          <h3 class="text-lg font-bold text-gray-800">Monitoreo de Denuncias / Reclamos</h3>
-          <p class="text-sm text-gray-600">
+          <h3 class="text-lg font-bold tracking-wide text-slate-100">
+            Monitoreo de Denuncias / Reclamos
+          </h3>
+          <p class="text-sm text-slate-300">
             Visualiza y gestiona las denuncias y reclamos presentados por los estudiantes.
           </p>
         </div>
@@ -16,245 +20,234 @@
     </ng-template>
 
     <ng-template pTemplate="content">
-      <!-- Buscador + Filtros -->
-      <div class="flex flex-col gap-3 mb-4 md:flex-row md:items-center">
-        <span class="relative w-full md:flex-1">
-          <i class="absolute text-gray-400 transform -translate-y-1/2 pi pi-search left-3 top-1/2"></i>
-          <input pInputText class="w-full pl-10" placeholder="Buscar por expediente, nombre o correo…"
-            [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" />
-        </span>
+      <!-- Filtros -->
+      <div class="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)]">
+        <div class="relative min-w-0">
+          <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input pInputText
+            class="w-full pr-4 pl-10 py-2 rounded-lg border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+            placeholder="Buscar por expediente, nombre o correo…" [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)" />
+        </div>
 
-        <p-select class="min-w-60" [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
-          placeholder="Todos los estados" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
-        </p-select>
+        <div class="min-w-0">
+          <p-select class="w-full" [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
+            placeholder="Todos los estados" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+          </p-select>
+        </div>
 
-        <p-select class="min-w-60" [options]="priorityOptions" optionLabel="label" optionValue="value"
-          [showClear]="true" placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
-          (ngModelChange)="selectedPriority.set($event)">
-        </p-select>
+        <div class="min-w-0">
+          <p-select class="w-full" [options]="priorityOptions" optionLabel="label" optionValue="value"
+            [showClear]="true" placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
+            (ngModelChange)="selectedPriority.set($event)">
+          </p-select>
+        </div>
       </div>
 
-      <!-- Tabla -->
       @if (errorCarga()) {
-      <div class="px-4 py-3 mb-4 text-sm border rounded-lg bg-red-50 text-red-700 border-red-200">
-        <i class="mr-2 pi pi-exclamation-triangle"></i>
+      <div class="mb-4 rounded-xl border border-solid border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <i class="pi pi-exclamation-triangle mr-2"></i>
         {{ errorCarga() }}
       </div>
       }
 
-      <p-table [value]="filteredComplaints()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-        [loading]="cargando()" [totalRecords]="filteredComplaints().length" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        class="overflow-hidden rounded-lg shadow-lg p-datatable-sm p-datatable-striped">
+      <div class="overflow-hidden rounded-2xl border border-solid border-slate-200 bg-white">
+        <p-table [value]="filteredComplaints()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
+          [loading]="cargando()" [totalRecords]="filteredComplaints().length" [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+          class="p-datatable-sm p-datatable-striped">
 
-        <!-- Header -->
-        <ng-template pTemplate="header">
-          <tr class="mt-2 bg-gray-50">
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-file"></i>
-                Expediente
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-user"></i>
-                Denunciante
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-users"></i>
-                Tipo Usuario
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-info-circle"></i>
-                Estado
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-exclamation-triangle"></i>
-                Prioridad
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-calendar"></i>
-                Fecha de Registro
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-user-edit"></i>
-                Adjuntos
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-user-edit"></i>
-                Asignado
-              </div>
-            </th>
-            <th class="px-4 py-3 font-bold tracking-wider text-left text-[#0d2f5d] uppercase text-md">
-              <div class="flex items-center justify-center gap-2">
-                <i class="text-[#0d2f5d] pi pi-cog"></i>
-                Acciones
-              </div>
-            </th>
-          </tr>
-        </ng-template>
+          <ng-template pTemplate="header">
+            <tr class="bg-slate-50">
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-file text-slate-500"></i>
+                  Expediente
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-user text-slate-500"></i>
+                  Denunciante
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-users text-slate-500"></i>
+                  Tipo Usuario
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-info-circle text-slate-500"></i>
+                  Estado
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-exclamation-triangle text-slate-500"></i>
+                  Prioridad
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-calendar text-slate-500"></i>
+                  Fecha de Registro
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-paperclip text-slate-500"></i>
+                  Adjuntos
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-user-edit text-slate-500"></i>
+                  Asignado
+                </div>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
+                <div class="flex items-center justify-center gap-2">
+                  <i class="pi pi-cog text-slate-500"></i>
+                  Acciones
+                </div>
+              </th>
+            </tr>
+          </ng-template>
 
-        <!-- Body -->
-        <ng-template pTemplate="body" let-complaint>
-          <tr class="transition-colors duration-200 hover:bg-gray-50">
-            <!-- Expediente -->
-            <td class="px-4 py-4 whitespace-nowrap">
-              <div class="text-sm font-bold text-center text-gray-900">{{ complaint.expediente }}</div>
-            </td>
+          <ng-template pTemplate="body" let-complaint>
+            <tr class="transition-colors duration-200 hover:bg-slate-50">
+              <td class="whitespace-nowrap px-4 py-4">
+                <div class="text-center text-sm font-bold text-slate-900">
+                  {{ complaint.expediente }}
+                </div>
+              </td>
 
-            <!-- Denunciante -->
-            <td class="px-4 py-4">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 w-8 h-8">
+              <td class="px-4 py-4">
+                <div class="flex items-center">
                   <div
-                    class="flex items-center justify-center w-8 h-8 border-2 border-gray-400 border-solid rounded-full">
-                    <span class="text-xs font-semibold text-gray-400">
-                      <i class="pi pi-user"></i>
-                    </span>
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-solid border-2 border-slate-300 text-slate-400">
+                    <i class="pi pi-user text-sm"></i>
                   </div>
-                </div>
-                <div class="ml-3">
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ complaint.nombre }} {{ complaint.apellidos }}
-                  </div>
-                  <div class="text-sm text-gray-500">
-                    {{ complaint.email }}
-                  </div>
-                </div>
-              </div>
-            </td>
 
-            <!-- Tipo Usuario -->
-            <td class="px-4 py-4 whitespace-nowrap">
-              <span class="inline-flex items-center px-2.5 py-1 text-sm font-semibold text-gray-900">
-                <span class="flex items-center justify-center mr-2 border-2 w-7 h-7"
-                  [style.background-color]="getTipoUsuarioStyle(complaint.tipoUsuario).iconBg"
-                  [style.border-color]="getTipoUsuarioStyle(complaint.tipoUsuario).iconColor">
-                  <i class="text-md pi" [style.color]="getTipoUsuarioStyle(complaint.tipoUsuario).iconColor"
-                    [ngClass]="getTipoUsuarioStyle(complaint.tipoUsuario).icon">
-                  </i>
+                  <div class="ml-3">
+                    <div class="text-sm font-medium text-slate-900">
+                      {{ complaint.nombre }} {{ complaint.apellidos }}
+                    </div>
+                    <div class="text-sm text-slate-500">
+                      {{ complaint.email }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="whitespace-nowrap px-4 py-4">
+                <span class="inline-flex items-center gap-2 px-2.5 py-1 text-sm font-semibold text-slate-900">
+                  <span [class]="getTipoUsuarioUi(complaint.tipoUsuario).wrapperClass">
+                    <i class="pi"
+                      [class]="getTipoUsuarioUi(complaint.tipoUsuario).iconClass + ' ' + getTipoUsuarioUi(complaint.tipoUsuario).icon">
+                    </i>
+                  </span>
+                  {{ getTipoUsuarioLabel(complaint.tipoUsuario) }}
                 </span>
-                {{ getTipoUsuarioLabel(complaint.tipoUsuario) }}
-              </span>
-            </td>
+              </td>
 
-            <!-- Estado -->
-            <td class="px-4 py-4 text-center whitespace-nowrap">
-              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full"
-                [style.background-color]="getEstadoStyle(complaint.estado).bg"
-                [style.color]="getEstadoStyle(complaint.estado).text"
-                [style.border]="'2px solid ' + getEstadoStyle(complaint.estado).border"
-                [ngClass]="getEstadoStyle(complaint.estado).animation">
-                <i class="mr-1 pi" [ngClass]="getEstadoStyle(complaint.estado).icon"></i>
-                {{ complaint.estado }}
-              </span>
-            </td>
+              <td class="whitespace-nowrap px-4 py-4 text-center">
+                <span [class]="getEstadoUi(complaint.estado).badgeClass">
+                  <i class="pi" [class]="getEstadoUi(complaint.estado).icon"></i>
+                  {{ complaint.estado }}
+                </span>
+              </td>
 
-            <!-- Prioridad -->
-            <td class="px-4 py-4 text-center whitespace-nowrap">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium"
-                [style.background-color]="getPrioridadStyle(complaint.prioridad).bg"
-                [style.color]="getPrioridadStyle(complaint.prioridad).text">
-                <div class="w-2 h-2 mr-1 rounded-full"
-                  [style.background-color]="getPrioridadStyle(complaint.prioridad).dotBg"
-                  [ngClass]="getPrioridadStyle(complaint.prioridad).animation">
+              <td class="whitespace-nowrap px-4 py-4 text-center">
+                <span [class]="getPrioridadUi(complaint.prioridad).badgeClass">
+                  <span [class]="getPrioridadUi(complaint.prioridad).dotClass"></span>
+                  {{ complaint.prioridad }}
+                </span>
+              </td>
+
+              <td class="whitespace-nowrap px-4 py-4 text-center">
+                <div class="text-sm text-slate-900">
+                  {{ complaint.fecha | date: 'dd/MM/yyyy' }}
                 </div>
-                {{ complaint.prioridad }}
-              </span>
-            </td>
+              </td>
 
-            <!-- Fecha -->
-            <td class="px-4 py-4 text-center whitespace-nowrap">
-              <div class="text-sm text-gray-900">
-                {{ complaint.fecha | date: 'dd/MM/yyyy' }}
-              </div>
-            </td>
-
-            <!-- Adjuntos -->
-            <td class="px-4 py-4 text-center whitespace-nowrap">
-              @if (complaint.adjuntos && complaint.adjuntos.length > 0) {
-              <div class="text-sm text-gray-900">
-                {{ complaint.adjuntos.length }} archivo(s)
-              </div>
-              } @else {
-              <span class="inline-flex items-center px-2 py-1 text-sm font-medium rounded-full animate-pulse-gentle"
-                style="background-color: #fafaf9; color: #44403c; border: 2px dashed #a8a29e;">
-                <i class="mr-1 pi pi-paperclip"></i>
-                Sin adjuntos
-              </span>
-              }
-            </td>
-
-            <!-- Asignado -->
-            <td class="px-4 py-4 text-center whitespace-nowrap">
-              @if (complaint.asignado) {
-              <div class="text-sm text-gray-900">
-                {{ complaint.asignado }}
-              </div>
-              } @else {
-              <span class="inline-flex items-center px-2 py-1 text-sm font-medium rounded-full animate-pulse-gentle"
-                style="background-color: #fafaf9; color: #44403c; border: 2px dashed #a8a29e;">
-                <i class="mr-1 pi pi-user-plus"></i>
-                Sin asignar
-              </span>
-              }
-            </td>
-
-            <!-- Acciones -->
-            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
-              <div class="flex items-center justify-center gap-2">
-                <p-button icon="pi pi-eye" severity="secondary" size="small" [raised]="true" pTooltip="Ver detalles"
-                  tooltipPosition="top" (onClick)="viewComplaint(complaint)">
-                </p-button>
-
-                <p-button icon="pi pi-inbox" severity="secondary" size="small" [raised]="true" pTooltip="Responder"
-                  tooltipPosition="top" (onClick)="responderComplaint(complaint)">
-                </p-button>
-
-                <p-button icon="pi pi-arrow-right-arrow-left" severity="secondary" size="small" [raised]="true"
-                  pTooltip="Derivar" tooltipPosition="top" (onClick)="derivarComplaint(complaint)">
-                </p-button>
-
-                <p-button icon="pi pi-history" severity="secondary" size="small" [raised]="true" pTooltip="Historial"
-                  tooltipPosition="top" (onClick)="verHistorialComplaint(complaint)">
-                </p-button>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-
-        <!-- Empty -->
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="9" class="py-8 text-center">
-              <div class="flex flex-col items-center gap-4">
-                <div class="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full">
-                  <i class="text-2xl text-gray-400 pi pi-inbox"></i>
+              <td class="whitespace-nowrap px-4 py-4 text-center">
+                @if (complaint.adjuntos && complaint.adjuntos.length > 0) {
+                <div class="text-sm text-slate-900">
+                  {{ complaint.adjuntos.length }} archivo(s)
                 </div>
-                <div>
-                  <h3 class="mb-1 text-lg font-medium text-gray-900">No hay denuncias</h3>
-                  <p class="text-gray-500">
-                    No se encontraron denuncias que coincidan con los criterios de búsqueda.
-                  </p>
+                } @else {
+                <span
+                  class="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-400 bg-stone-50 px-2 py-1 text-sm font-medium text-stone-700">
+                  <i class="pi pi-paperclip"></i>
+                  Sin adjuntos
+                </span>
+                }
+              </td>
+
+              <td class="whitespace-nowrap px-4 py-4 text-center">
+                @if (complaint.asignado) {
+                <div class="text-sm text-slate-900">
+                  {{ complaint.asignado }}
                 </div>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+                } @else {
+                <span
+                  class="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-400 bg-stone-50 px-2 py-1 text-sm font-medium text-stone-700">
+                  <i class="pi pi-user-plus"></i>
+                  Sin asignar
+                </span>
+                }
+              </td>
+
+              <td class="whitespace-nowrap px-4 py-4 text-sm font-medium">
+                <div class="flex items-center justify-center gap-2">
+                  <p-button icon="pi pi-eye" severity="secondary" size="small" [raised]="true"
+                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900"
+                    pTooltip="Ver detalles" tooltipPosition="top" (onClick)="viewComplaint(complaint)">
+                  </p-button>
+
+                  <p-button icon="pi pi-inbox" severity="secondary" size="small" [raised]="true"
+                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900"
+                    pTooltip="Responder" tooltipPosition="top" (onClick)="responderComplaint(complaint)">
+                  </p-button>
+
+                  <p-button icon="pi pi-arrow-right-arrow-left" severity="secondary" size="small" [raised]="true"
+                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900"
+                    pTooltip="Derivar" tooltipPosition="top" (onClick)="derivarComplaint(complaint)">
+                  </p-button>
+
+                  <p-button icon="pi pi-history" severity="secondary" size="small" [raised]="true"
+                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900"
+                    pTooltip="Historial" tooltipPosition="top" (onClick)="verHistorialComplaint(complaint)">
+                  </p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="9" class="py-10 text-center">
+                <div class="flex flex-col items-center gap-4">
+                  <div class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                    <i class="pi pi-inbox text-2xl text-slate-400"></i>
+                  </div>
+                  <div>
+                    <h3 class="mb-1 text-lg font-medium text-slate-900">
+                      No hay denuncias
+                    </h3>
+                    <p class="text-slate-500">
+                      No se encontraron denuncias que coincidan con los criterios de búsqueda.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </ng-template>
   </p-card>
-</div>
+</section>

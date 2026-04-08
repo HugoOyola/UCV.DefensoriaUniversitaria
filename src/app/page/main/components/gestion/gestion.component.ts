@@ -13,12 +13,27 @@ import {
   EstadoDenuncia,
   PrioridadDenuncia,
   TipoUsuarioDenuncia,
-  TipoUsuarioStyle,
-  EstadoStyle,
-  PrioridadStyle
 } from '../../interface/denuncias.interface';
+
+type TipoUsuarioUi = {
+  icon: string;
+  wrapperClass: string;
+  iconClass: string;
+};
+
+type EstadoUi = {
+  icon: string;
+  badgeClass: string;
+  iconClass?: string;
+};
+
+type PrioridadUi = {
+  badgeClass: string;
+  dotClass: string;
+};
+
 @Component({
-  selector: "app-gestion",
+  selector: 'app-gestion',
   imports: [
     CommonModule,
     FormsModule,
@@ -29,30 +44,26 @@ import {
     TableModule,
     TooltipModule,
   ],
-  templateUrl: "./gestion.component.html",
-  styleUrl: "./gestion.component.scss",
+  templateUrl: './gestion.component.html',
+  styleUrl: './gestion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [MainService]
+  providers: [MainService],
 })
 export class GestionComponent {
-  // Servicio inyectado. Aqui hoy usamos mock y luego podra apuntar al endpoint real.
   private readonly mainService = inject(MainService);
 
-  // Signals para controlar la apertura de modales y el item seleccionado.
   public complaintSeleccionado = signal<Denuncia | null>(null);
   public mostrarModalDetalle = signal(false);
   public mostrarModalResponder = signal(false);
   public mostrarModalDerivar = signal(false);
   public mostrarModalHistorial = signal(false);
 
-  // Signals de filtros y estado de carga de la vista.
   public searchTerm = signal('');
   public selectedStatus = signal<EstadoDenuncia | null>(null);
   public selectedPriority = signal<PrioridadDenuncia | null>(null);
   public cargando = signal(true);
   public errorCarga = signal<string | null>(null);
 
-  // ─── Opciones de selectores ──────────────────────────────────────────────────
   public statusOptions = [
     { label: 'Pendiente', value: 'Pendiente' as EstadoDenuncia },
     { label: 'En Proceso', value: 'En Proceso' as EstadoDenuncia },
@@ -65,62 +76,96 @@ export class GestionComponent {
     { label: 'Baja', value: 'Baja' as PrioridadDenuncia },
   ];
 
-  // Lista base que alimenta la tabla.
   public complaints = signal<Denuncia[]>([]);
+
+  private readonly tipoUsuarioUi: Record<TipoUsuarioDenuncia, TipoUsuarioUi> = {
+    '13': {
+      icon: 'pi-user',
+      wrapperClass: 'flex h-8 w-8 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600',
+      iconClass: 'text-sm text-blue-600',
+    },
+    '12': {
+      icon: 'pi-book',
+      wrapperClass: 'flex h-8 w-8 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600',
+      iconClass: 'text-sm text-emerald-600',
+    },
+    '21': {
+      icon: 'pi-briefcase',
+      wrapperClass: 'flex h-8 w-8 items-center justify-center rounded-xl border border-orange-200 bg-orange-50 text-orange-600',
+      iconClass: 'text-sm text-orange-600',
+    },
+    '14': {
+      icon: 'pi-user-edit',
+      wrapperClass: 'flex h-8 w-8 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600',
+      iconClass: 'text-sm text-rose-600',
+    },
+    '72': {
+      icon: 'pi-graduation-cap',
+      wrapperClass: 'flex h-8 w-8 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-violet-600',
+      iconClass: 'text-sm text-violet-600',
+    },
+  };
+
+  private readonly estadoUi: Record<EstadoDenuncia, EstadoUi> = {
+    Pendiente: {
+      icon: 'pi-clock',
+      badgeClass:
+        'inline-flex items-center gap-1 rounded-full border border-stone-300 bg-stone-100 px-3 py-1 text-sm font-semibold text-stone-700 estado-pendiente-anim',
+    },
+    'En Proceso': {
+      icon: 'pi-spinner pi-spin',
+      badgeClass:
+        'inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800',
+    },
+    Resuelto: {
+      icon: 'pi-check-circle',
+      badgeClass:
+        'inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700 shadow-sm estado-resuelto-anim',
+    },
+  };
+
+  private readonly prioridadUi: Record<PrioridadDenuncia, PrioridadUi> = {
+    Alta: {
+      badgeClass:
+        'inline-flex items-center gap-2 rounded-full bg-red-50 px-2.5 py-1 text-sm font-semibold text-red-700 ring-1 ring-inset ring-red-200',
+      dotClass: 'h-2.5 w-2.5 rounded-full bg-red-500 prioridad-alta-dot-anim',
+    },
+    Media: {
+      badgeClass:
+        'inline-flex items-center gap-2 rounded-full bg-orange-50 px-2.5 py-1 text-sm font-semibold text-orange-700 ring-1 ring-inset ring-orange-200',
+      dotClass: 'h-2.5 w-2.5 rounded-full bg-orange-500 prioridad-media-dot-anim',
+    },
+    Baja: {
+      badgeClass:
+        'inline-flex items-center gap-2 rounded-full bg-amber-50 px-2.5 py-1 text-sm font-semibold text-amber-700 ring-1 ring-inset ring-amber-200',
+      dotClass: 'h-2.5 w-2.5 rounded-full bg-amber-400',
+    },
+  };
 
   constructor() {
     this.cargarDenuncias();
   }
 
-  /**
-   * Carga las denuncias desde el servicio.
-   * Como es una llamada HTTP simple, la suscripcion se completa sola.
-   * Cuando exista el endpoint real, el cambio quedara encapsulado en el servicio.
-   */
   private cargarDenuncias(): void {
     this.cargando.set(true);
     this.errorCarga.set(null);
 
-    this.mainService.post_Main_ObtenerDenuncias()
-      .subscribe({
-        next: (response) => {
-          // Tomamos la lista desde la misma estructura que luego devolvera la API.
-          this.complaints.set(response.body?.lstItem ?? []);
-        },
-        error: (error) => {
-          console.error('Error al cargar las denuncias:', error);
-          this.complaints.set([]);
-          this.errorCarga.set('No se pudo cargar el listado de denuncias.');
-          this.cargando.set(false);
-        },
-        complete: () => {
-          this.cargando.set(false);
-        }
-      });
+    this.mainService.post_Main_ObtenerDenuncias().subscribe({
+      next: (response) => {
+        this.complaints.set(response.body?.lstItem ?? []);
+      },
+      error: (error) => {
+        console.error('Error al cargar las denuncias:', error);
+        this.complaints.set([]);
+        this.errorCarga.set('No se pudo cargar el listado de denuncias.');
+        this.cargando.set(false);
+      },
+      complete: () => {
+        this.cargando.set(false);
+      },
+    });
   }
 
-  // Mapas visuales para no repetir colores o iconos dentro del HTML.
-  private readonly TIPO_USUARIO_STYLES: Record<TipoUsuarioDenuncia, TipoUsuarioStyle> = {
-    '13': { iconBg: '#dbeafe', iconColor: '#2563eb', icon: 'pi-user' },
-    '12': { iconBg: '#dcfce7', iconColor: '#16a34a', icon: 'pi-book' },
-    '21': { iconBg: '#ffedd5', iconColor: '#ea580c', icon: 'pi-briefcase' },
-    '14': { iconBg: '#fee2e2', iconColor: '#dc2626', icon: 'pi-user-edit' },
-    '72': { iconBg: '#f3e8ff', iconColor: '#9333ea', icon: 'pi-graduation-cap' }
-  };
-
-  private readonly ESTADO_STYLES: Record<EstadoDenuncia, EstadoStyle> = {
-    'Pendiente': { bg: '#e7e5e4', text: '#44403c', border: '#d6d3d1', icon: 'pi-clock', animation: 'animate-pulse' },
-    'En Proceso': { bg: '#dbeafe', text: '#1e3a8a', border: '#93c5fd', icon: 'pi-spin pi-spinner', animation: '' },
-    'Resuelto': { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7', icon: 'pi-check-circle', animation: 'animate-bounce-soft' },
-  };
-
-  private readonly PRIORIDAD_STYLES: Record<PrioridadDenuncia, PrioridadStyle> = {
-    Alta: { bg: '#fee2e2', text: '#991b1b', dotBg: '#dc2626', animation: 'animate-ping-dot' },
-    Media: { bg: '#ffedd5', text: '#9a3412', dotBg: '#ea580c', animation: 'animate-pulse-slow' },
-    Baja: { bg: '#fef9c3', text: '#854d0e', dotBg: '#eab308', animation: '' },
-  };
-
-  // Computed que recalcula la tabla cada vez que cambian datos o filtros.
   public filteredComplaints = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const status = this.selectedStatus();
@@ -138,33 +183,34 @@ export class GestionComponent {
         c.documento.toLowerCase().includes(term) ||
         tipoUsuarioLabel.includes(term);
 
-      return (
-        (!status || c.estado === status) &&
-        (!priority || c.prioridad === priority) &&
-        matchesTerm
-      );
+      return (!status || c.estado === status) && (!priority || c.prioridad === priority) && matchesTerm;
     });
   });
 
-  // Helpers usados por la plantilla para mostrar etiquetas y estilos.
-  getTipoUsuarioStyle(tipo: TipoUsuarioDenuncia): TipoUsuarioStyle {
-    return this.TIPO_USUARIO_STYLES[tipo] || this.TIPO_USUARIO_STYLES['13'];
+  getTipoUsuarioUi(tipo: TipoUsuarioDenuncia): TipoUsuarioUi {
+    return this.tipoUsuarioUi[tipo] ?? this.tipoUsuarioUi['13'];
   }
-  getEstadoStyle(estado: EstadoDenuncia): EstadoStyle { return this.ESTADO_STYLES[estado] || this.ESTADO_STYLES['Pendiente']; }
-  getPrioridadStyle(prioridad: PrioridadDenuncia): PrioridadStyle { return this.PRIORIDAD_STYLES[prioridad] || this.PRIORIDAD_STYLES['Baja']; }
+
+  getEstadoUi(estado: EstadoDenuncia): EstadoUi {
+    return this.estadoUi[estado] ?? this.estadoUi['Pendiente'];
+  }
+
+  getPrioridadUi(prioridad: PrioridadDenuncia): PrioridadUi {
+    return this.prioridadUi[prioridad] ?? this.prioridadUi.Baja;
+  }
+
   getTipoUsuarioLabel(tipo: TipoUsuarioDenuncia): string {
     const map: Record<TipoUsuarioDenuncia, string> = {
       '13': 'Estudiante',
       '12': 'Docente',
       '21': 'Administrativo',
       '14': 'Egresado',
-      '72': 'Graduado'
+      '72': 'Graduado',
     };
 
-    return map[tipo] || tipo;
+    return map[tipo] ?? tipo;
   }
 
-  // Acciones de UI.
   viewComplaint(complaint: Denuncia): void {
     this.complaintSeleccionado.set(complaint);
     this.mostrarModalDetalle.set(true);
@@ -174,7 +220,6 @@ export class GestionComponent {
     this.mostrarModalDetalle.set(false);
   }
 
-  // ─── Acciones: modal Responder ───────────────────────────────────────────────
   responderComplaint(complaint: Denuncia): void {
     this.complaintSeleccionado.set(complaint);
     this.mostrarModalResponder.set(true);
@@ -188,7 +233,6 @@ export class GestionComponent {
     const complaint = this.complaintSeleccionado();
     if (!complaint) return;
 
-    // Actualizamos el estado local para reflejar el cambio en pantalla.
     this.complaints.update((lista) =>
       lista.map((item) =>
         item.expediente === complaint.expediente
@@ -200,7 +244,6 @@ export class GestionComponent {
     this.cerrarModalResponder();
   }
 
-  // ─── Acciones: modal Derivar ─────────────────────────────────────────────────
   derivarComplaint(complaint: Denuncia): void {
     this.complaintSeleccionado.set(complaint);
     this.mostrarModalDerivar.set(true);
@@ -210,7 +253,6 @@ export class GestionComponent {
     this.mostrarModalDerivar.set(false);
   }
 
-  // ─── Acciones: modal Historial ───────────────────────────────────────────────
   verHistorialComplaint(complaint: Denuncia): void {
     this.complaintSeleccionado.set(complaint);
     this.mostrarModalHistorial.set(true);
