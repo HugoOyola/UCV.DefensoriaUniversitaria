@@ -6,7 +6,9 @@
     <div class="ucv-header">
       <div class="ucv-header__left">
         @if (icon()) {
-        <i [class]="icon()"></i>
+        <div class="ucv-header__icon">
+          <i [class]="icon()"></i>
+        </div>
         }
 
         <div class="ucv-header__content">
