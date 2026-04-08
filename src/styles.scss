@@ -63,3 +63,131 @@ body {
 		@apply w-full  flex flex-col p-4 shadow rounded-xl bg-white;
 	}
 }
+
+// MODAL REUTILIZABLE:
+.ucv-dialog.p-dialog {
+	border: 0 !important;
+	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.24);
+	border-radius: 12px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.ucv-dialog .p-dialog-header {
+	padding: 0 1rem 0 0;
+	margin: 0;
+	background: #243659;
+	color: #fff;
+	border: 0 !important;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	flex-shrink: 0;
+}
+
+.ucv-dialog .p-dialog-header-icons {
+	padding: 0;
+	margin: 0;
+	gap: 0.25rem;
+}
+
+.ucv-dialog .ucv-header {
+	position: relative;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.875rem 1.25rem;
+	margin: 0;
+	background: #243659;
+	min-height: 3.5rem;
+}
+
+.ucv-dialog .ucv-header__left {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+}
+
+.ucv-dialog .ucv-header__left .pi {
+	font-size: 1.1rem;
+	opacity: 0.95;
+}
+
+.ucv-dialog .ucv-header__title {
+	display: flex;
+	font-weight: 700;
+	font-size: 1.05rem;
+	letter-spacing: 0.2px;
+}
+
+.ucv-dialog .ucv-header__right {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.ucv-dialog .ucv-badge,
+.ucv-dialog .ucv-chip {
+	background: rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	color: #e8f0ff;
+	padding: 0.15rem 0.5rem;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.ucv-dialog .p-dialog-header .p-dialog-header-icon {
+	color: #fff;
+	border-radius: 50%;
+	transition: background 0.2s ease, opacity 0.2s ease;
+	opacity: 0.9;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.ucv-dialog .p-dialog-header .p-dialog-header-icon:hover {
+	background: rgba(255, 255, 255, 0.12);
+	opacity: 1;
+}
+
+.ucv-dialog .p-dialog-header .p-dialog-header-icon .p-icon {
+	width: 1rem;
+	height: 1rem;
+}
+
+.ucv-dialog .p-dialog-content {
+	background: #fff;
+	border: 0 !important;
+	border-top: 0 !important;
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 1.5rem;
+	min-height: 0;
+}
+
+.ucv-dialog .p-dialog-footer {
+	border-top: 1px solid #e5e7eb !important;
+	background: #ffffff;
+	padding: 1rem 1.5rem;
+	flex-shrink: 0;
+	border-bottom-left-radius: 12px;
+	border-bottom-right-radius: 12px;
+	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.p-dialog-mask {
+	z-index: 12000 !important;
+}
+
+.ucv-dialog {
+	z-index: 12001 !important;
+}
