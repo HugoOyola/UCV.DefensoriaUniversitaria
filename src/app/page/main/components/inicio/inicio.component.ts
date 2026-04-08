@@ -9,6 +9,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
+import { SkeletonComponent } from '@shared/components/skeleon/skeleton.component';
 import { MainService } from '../../services/main.service';
 import {
 	Denuncia,
@@ -64,7 +65,8 @@ interface MetricaInferior {
 		TableModule,
 		TagModule,
 		SelectModule,
-		TooltipModule
+		TooltipModule,
+		SkeletonComponent
 	],
 	templateUrl: './inicio.component.html',
 	styleUrl: './inicio.component.scss',
