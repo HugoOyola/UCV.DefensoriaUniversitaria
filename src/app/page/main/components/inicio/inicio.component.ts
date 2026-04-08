@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 type EstadoReclamo = 'Pendiente' | 'Resuelto' | 'Investigación';
 
@@ -56,7 +57,8 @@ interface MetricaInferior {
 		ButtonModule,
 		TableModule,
 		TagModule,
-		SelectModule
+		SelectModule,
+		TooltipModule
 	],
 	templateUrl: './inicio.component.html',
 	styleUrl: './inicio.component.scss',

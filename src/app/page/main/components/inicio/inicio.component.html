@@ -3,10 +3,10 @@
     <header class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">
-          Defensoría Universitaria - Panel de Control
+          Defensoría Universitaria
         </h1>
         <p class="mt-1 text-sm text-slate-600 md:text-base">
-          Monitoreo de la eficiencia en la resolución a través de la red universitaria.
+          Seguimiento y optimización en la atención de casos de la comunidad universitaria.
         </p>
       </div>
 
@@ -22,7 +22,7 @@
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
       @for (tarjeta of tarjetasResumen(); track tarjeta.titulo) {
-      <article class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <article class="relative overflow-hidden rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
         <div class="absolute -right-4 -bottom-5 text-slate-100">
           <i [class]="tarjeta.icono + ' text-7xl'"></i>
         </div>
@@ -52,13 +52,16 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.05fr_1.5fr]">
-      <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
         <div class="mb-6 flex items-center justify-between">
           <h2 class="text-xl font-bold text-slate-900">Distribución por tipo de usuario</h2>
-          <span
-            class="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 text-xs font-bold text-slate-400">
+          <button type="button"
+            pTooltip="Distribución de usuarios según su tipo dentro del sistema. Los porcentajes representan la proporción sobre el total."
+            tooltipPosition="top"
+            class="flex h-6 w-6 items-center justify-center rounded-full border border-solid border-slate-300 text-xs font-bold text-slate-400 transition hover:bg-slate-50"
+            aria-label="Información sobre la distribución de usuarios">
             i
-          </span>
+          </button>
         </div>
 
         <div class="space-y-5">
@@ -81,16 +84,16 @@
         </div>
 
         <div class="mt-10 flex items-end justify-between gap-4">
-          <p class="max-w-[180px] text-xs leading-5 text-slate-400">
+          <p class="max-w-[180px] text-xs text-slate-400">
             Los datos demográficos se actualizan en tiempo real conforme se registran los tickets.
           </p>
-
-          <button pButton type="button" label="Ver reporte detallado" severity="secondary" text
-            class="!px-0 !text-sm !font-semibold"></button>
+          <button pButton type="button" size="small" label="Ver reporte detallado" severity="secondary" outlined
+            class="!rounded-xl">
+          </button>
         </div>
       </article>
 
-      <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 class="text-xl font-bold text-slate-900">Reclamos recientes</h2>
 
@@ -104,28 +107,39 @@
 
         <p-table [value]="reclamosFiltrados()" [tableStyle]="{ 'min-width': '100%' }" styleClass="p-datatable-sm">
           <ng-template pTemplate="header">
-            <tr class="text-xs uppercase tracking-[0.18em] text-slate-400">
-              <th class="!border-0 !bg-transparent !px-3 !py-3 text-left">ID de referencia</th>
-              <th class="!border-0 !bg-transparent !px-3 !py-3 text-left">Fecha de envío</th>
-              <th class="!border-0 !bg-transparent !px-3 !py-3 text-left">Campus</th>
-              <th class="!border-0 !bg-transparent !px-3 !py-3 text-right">Estado</th>
+            <tr class="text-sm uppercase tracking-[0.18em] text-slate-400">
+              <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
+                ID de referencia
+              </th>
+              <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
+                Fecha de envío
+              </th>
+              <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
+                Campus
+              </th>
+              <th class="!bg-transparent !px-3 !py-3 !text-right !border-0 !border-b !border-slate-300 !border-solid">
+                Estado
+              </th>
             </tr>
           </ng-template>
 
           <ng-template pTemplate="body" let-reclamo>
-            <tr class="border-b border-slate-100 last:border-b-0">
-              <td class="!border-0 !px-3 !py-4">
+            <tr class="hover:bg-slate-50 transition-colors duration-150">
+              <td class="!px-3 !py-4 !border-0 !border-b !border-slate-200 !border-solid">
                 <span class="font-bold text-slate-800">{{ reclamo.id }}</span>
               </td>
-              <td class="!border-0 !px-3 !py-4 text-slate-600">
+
+              <td class="!px-3 !py-4 text-slate-600 !border-0 !border-b !border-slate-200 !border-solid">
                 {{ reclamo.fechaEnvio | date: 'dd MMM, yyyy' }}
               </td>
-              <td class="!border-0 !px-3 !py-4 text-slate-700">
+
+              <td class="!px-3 !py-4 text-slate-700 !border-0 !border-b !border-slate-200 !border-solid">
                 {{ reclamo.campus }}
               </td>
-              <td class="!border-0 !px-3 !py-4 text-right">
+
+              <td class="!px-3 !py-4 text-right !border-0 !border-b !border-slate-200 !border-solid">
                 <p-tag [value]="reclamo.estado" [severity]="obtenerSeveridadEstado(reclamo.estado)"
-                  styleClass="!rounded-full !px-3 !py-1 !text-xs !font-semibold" />
+                  styleClass="!rounded-full !px-3 !py-1 !text-xs !font-semibold"></p-tag>
               </td>
             </tr>
           </ng-template>
