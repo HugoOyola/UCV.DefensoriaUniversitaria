@@ -8,6 +8,7 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { GestionModalesComponent } from '@app/page/main/components/gestion/modales/gestion-modales.component';
+import { SkeletonComponent } from '@shared/components/skeleon/skeleton.component';
 import { MainService } from '../../services/main.service';
 import {
   Denuncia,
@@ -44,6 +45,7 @@ type PrioridadUi = {
     SelectModule,
     TableModule,
     TooltipModule,
+    SkeletonComponent,
     GestionModalesComponent,
   ],
   templateUrl: './gestion.component.html',
