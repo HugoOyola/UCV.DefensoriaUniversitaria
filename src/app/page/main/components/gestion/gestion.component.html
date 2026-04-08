@@ -31,13 +31,13 @@
         </div>
 
         <div class="min-w-0">
-          <p-select class="w-full" [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
+          <p-select class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60" [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
             placeholder="Todos los estados" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
           </p-select>
         </div>
 
         <div class="min-w-0">
-          <p-select class="w-full" [options]="priorityOptions" optionLabel="label" optionValue="value"
+          <p-select class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60" [options]="priorityOptions" optionLabel="label" optionValue="value"
             [showClear]="true" placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
             (ngModelChange)="selectedPriority.set($event)">
           </p-select>
