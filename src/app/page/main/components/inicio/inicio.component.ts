@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { startWith } from 'rxjs';
@@ -9,8 +9,13 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
-
-type EstadoReclamo = 'Pendiente' | 'Resuelto' | 'Investigación';
+import { MainService } from '../../services/main.service';
+import {
+	Denuncia,
+	EstadoDenuncia,
+	PrioridadDenuncia,
+	TipoUsuarioDenuncia
+	} from '../../interface/denuncias.interface';
 
 interface OpcionCampus {
 	label: string;
@@ -19,7 +24,7 @@ interface OpcionCampus {
 
 interface TarjetaResumen {
 	titulo: string;
-	valor: string;
+	valor: number | string;
 	sufijo?: string;
 	insignia?: {
 		texto: string;
@@ -34,16 +39,17 @@ interface DistribucionUsuario {
 	cantidad: number;
 }
 
-interface ReclamoReciente {
-	id: string;
-	fechaEnvio: string;
+interface DenunciaReciente {
+	expediente: string;
+	fecha: Date;
 	campus: string;
-	estado: EstadoReclamo;
+	estado: EstadoDenuncia;
+	prioridad: PrioridadDenuncia;
 }
 
 interface MetricaInferior {
 	titulo: string;
-	valor: string;
+	valor: number | string;
 	subtitulo: string;
 	progreso: number;
 	icono: string;
@@ -65,16 +71,43 @@ interface MetricaInferior {
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InicioComponent {
-	public readonly opcionesCampus = signal<OpcionCampus[]>([
-		{ label: 'Todos los campus (12)', value: 'all' },
-		{ label: 'Lima Central', value: 'Lima Central' },
-		{ label: 'Trujillo', value: 'Trujillo' },
-		{ label: 'Chiclayo', value: 'Chiclayo' },
-		{ label: 'Piura', value: 'Piura' }
-	]);
+	private readonly _mainService = inject(MainService);
+	private static readonly LIMITE_DENUNCIAS = 5;
+
+	private readonly campusPorFilial: Record<string, string> = {
+		'1': 'Lima Norte',
+		'2': 'Trujillo',
+		'3': 'Chiclayo',
+		'4': 'Piura',
+		'5': 'Tarapoto'
+	};
+
+	private readonly nombreTipoUsuario: Record<TipoUsuarioDenuncia, string> = {
+		'13': 'Estudiantes',
+		'12': 'Docentes',
+		'21': 'Personal administrativo',
+		'14': 'Egresados',
+		'72': 'Graduados'
+	};
+
+	public readonly denuncias = signal<Denuncia[]>([]);
+	public readonly cargando = signal<boolean>(true);
+	public readonly mostrarTodos = signal<boolean>(false);
+	public readonly opcionesCampus = computed<OpcionCampus[]>(() => {
+		const opciones = Array.from(
+			new Set(this.denuncias().map((denuncia) => this.obtenerNombreCampus(denuncia.filial)))
+		)
+			.filter(Boolean)
+			.sort((campusA, campusB) => campusA.localeCompare(campusB));
+
+		return [
+			{ label: 'Todos los campus', value: 'all' },
+			...opciones.map((campus) => ({ label: campus, value: campus }))
+		];
+	});
 
 	public readonly campusControl = new FormControl<OpcionCampus>(
-		{ label: 'Todos los campus (12)', value: 'all' },
+		{ label: 'Todos los campus', value: 'all' },
 		{ nonNullable: true }
 	);
 
@@ -83,111 +116,152 @@ export class InicioComponent {
 		{ initialValue: this.campusControl.value }
 	);
 
-	public readonly tarjetasResumen = signal<TarjetaResumen[]>([
-		{
-			titulo: 'Total de reclamos',
-			valor: '1,482',
-			insignia: { texto: '↗ 12%', tono: 'success' },
-			icono: 'pi pi-file'
-		},
-		{
-			titulo: 'Pendientes de resolución',
-			valor: '234',
-			insignia: { texto: '5 urgentes', tono: 'danger' },
-			icono: 'pi pi-clock'
-		},
-		{
-			titulo: 'Casos resueltos',
-			valor: '1,248',
-			insignia: { texto: '84% tasa', tono: 'success' },
-			icono: 'pi pi-check-circle'
-		},
-		{
-			titulo: 'Tiempo promedio de resolución',
-			valor: '4.2',
-			sufijo: 'días',
-			icono: 'pi pi-info-circle'
-		}
-	]);
+	public readonly tarjetasResumen = computed<TarjetaResumen[]>(() => {
+		const denuncias = this.denuncias();
+		const total = denuncias.length;
+		const pendientes = denuncias.filter((denuncia) => denuncia.estado === 'Pendiente').length;
+		const resueltas = denuncias.filter((denuncia) => denuncia.estado === 'Resuelto').length;
+		const altaPrioridad = denuncias.filter((denuncia) => denuncia.prioridad === 'Alta').length;
 
-	public readonly distribucionUsuarios = signal<DistribucionUsuario[]>([
-		{ etiqueta: 'Estudiantes', porcentaje: 65, cantidad: 964 },
-		{ etiqueta: 'Docentes', porcentaje: 18, cantidad: 266 },
-		{ etiqueta: 'Personal administrativo', porcentaje: 12, cantidad: 178 },
-		{ etiqueta: 'Egresados', porcentaje: 5, cantidad: 74 }
-	]);
-
-	public readonly reclamosRecientes = signal<ReclamoReciente[]>([
-		{
-			id: '#DU-2024-0892',
-			fechaEnvio: '2023-10-24',
-			campus: 'Lima Central',
-			estado: 'Pendiente'
-		},
-		{
-			id: '#DU-2024-0891',
-			fechaEnvio: '2023-10-23',
-			campus: 'Trujillo',
-			estado: 'Resuelto'
-		},
-		{
-			id: '#DU-2024-0890',
-			fechaEnvio: '2023-10-23',
-			campus: 'Chiclayo',
-			estado: 'Investigación'
-		},
-		{
-			id: '#DU-2024-0889',
-			fechaEnvio: '2023-10-22',
-			campus: 'Piura',
-			estado: 'Resuelto'
-		}
-	]);
-
-	public readonly reclamosFiltrados = computed(() => {
-		const campus = this.campusSeleccionado()?.value ?? 'all';
-
-		if (campus === 'all') {
-			return this.reclamosRecientes();
-		}
-
-		return this.reclamosRecientes().filter((reclamo) => reclamo.campus === campus);
+		return [
+			{
+				titulo: 'Total de denuncias',
+				valor: total,
+				insignia: { texto: `${this.redondearPorcentaje(total, total)} registradas`, tono: 'info' },
+				icono: 'pi pi-file'
+			},
+			{
+				titulo: 'Pendientes de atención',
+				valor: pendientes,
+				insignia: { texto: `${this.redondearPorcentaje(pendientes, total)} del total`, tono: 'danger' },
+				icono: 'pi pi-clock'
+			},
+			{
+				titulo: 'Casos resueltos',
+				valor: resueltas,
+				insignia: { texto: `${this.redondearPorcentaje(resueltas, total)} de cierre`, tono: 'success' },
+				icono: 'pi pi-check-circle'
+			},
+			{
+				titulo: 'Alta prioridad',
+				valor: altaPrioridad,
+				insignia: { texto: `${this.redondearPorcentaje(altaPrioridad, total)} críticas`, tono: 'danger' },
+				icono: 'pi pi-exclamation-triangle'
+			}
+		];
 	});
 
-	public readonly metricasInferiores = signal<MetricaInferior[]>([
-		{
-			titulo: 'Satisfacción del cliente',
-			valor: '92.4%',
-			subtitulo: '+2.1% vs año anterior',
-			progreso: 92.4,
-			icono: 'pi pi-face-smile'
-		},
-		{
-			titulo: 'Tasa de resolución',
-			valor: '84.2%',
-			subtitulo: 'Meta: 85%',
-			progreso: 84.2,
-			icono: 'pi pi-check-circle'
-		},
-		{
-			titulo: 'Tasa de reclamos pendientes',
-			valor: '15.8%',
-			subtitulo: '-0.4% mejora',
-			progreso: 15.8,
-			icono: 'pi pi-exclamation-triangle'
+	public readonly distribucionUsuarios = computed<DistribucionUsuario[]>(() => {
+		const total = this.denuncias().length;
+		const conteo = this.denuncias().reduce((acumulado, denuncia) => {
+			const tipo = denuncia.tipoUsuario;
+			acumulado[tipo] = (acumulado[tipo] ?? 0) + 1;
+			return acumulado;
+		}, {} as Record<TipoUsuarioDenuncia, number>);
+
+		return (Object.entries(conteo) as [TipoUsuarioDenuncia, number][])
+			.map(([tipo, cantidad]) => ({
+				etiqueta: this.nombreTipoUsuario[tipo as TipoUsuarioDenuncia],
+				cantidad,
+				porcentaje: this.calcularPorcentaje(cantidad, total)
+			}))
+			.sort((itemA, itemB) => itemB.cantidad - itemA.cantidad);
+	});
+
+	public readonly denunciasRecientes = computed<DenunciaReciente[]>(() =>
+		[...this.denuncias()]
+			.sort((denunciaA, denunciaB) => denunciaB.fecha.getTime() - denunciaA.fecha.getTime())
+			.map((denuncia) => ({
+				expediente: denuncia.expediente,
+				fecha: denuncia.fecha,
+				campus: this.obtenerNombreCampus(denuncia.filial),
+				estado: denuncia.estado,
+				prioridad: denuncia.prioridad
+			}))
+	);
+
+	public readonly denunciasFiltradas = computed(() => {
+		const campus = this.campusSeleccionado()?.value ?? 'all';
+		const denunciasFiltradas =
+			campus === 'all'
+				? this.denunciasRecientes()
+				: this.denunciasRecientes().filter((denuncia) => denuncia.campus === campus);
+
+		if (this.mostrarTodos()) {
+			return denunciasFiltradas;
 		}
-	]);
+
+		return denunciasFiltradas.slice(0, InicioComponent.LIMITE_DENUNCIAS);
+	});
+
+	public readonly metricasInferiores = computed<MetricaInferior[]>(() => {
+		const denuncias = this.denuncias();
+		const total = denuncias.length;
+		const conApoderado = denuncias.filter((denuncia) => denuncia.isApoderado).length;
+		const conAdjuntos = denuncias.filter((denuncia) => (denuncia.adjuntos?.length ?? 0) > 0).length;
+		const derivadas = denuncias.filter((denuncia) => this.tieneOtraAreaMarcada(denuncia)).length;
+
+		return [
+			{
+				titulo: 'Casos con apoderado',
+				valor: conApoderado,
+				subtitulo: `${this.redondearPorcentaje(conApoderado, total)} del total`,
+				progreso: this.calcularPorcentaje(conApoderado, total),
+				icono: 'pi pi-users'
+			},
+			{
+				titulo: 'Expedientes con adjuntos',
+				valor: conAdjuntos,
+				subtitulo: `${this.redondearPorcentaje(conAdjuntos, total)} documentados`,
+				progreso: this.calcularPorcentaje(conAdjuntos, total),
+				icono: 'pi pi-paperclip'
+			},
+			{
+				titulo: 'Casos derivados a otras áreas',
+				valor: derivadas,
+				subtitulo: `${this.redondearPorcentaje(derivadas, total)} requieren seguimiento`,
+				progreso: this.calcularPorcentaje(derivadas, total),
+				icono: 'pi pi-send'
+			}
+		];
+	});
+
+	constructor() {
+		effect(() => {
+			this.campusSeleccionado();
+			this.mostrarTodos.set(false);
+		});
+
+		this.cargarDenuncias();
+	}
+
+	alternarVerTodos(): void {
+		this.mostrarTodos.update((valorActual) => !valorActual);
+	}
 
 	obtenerSeveridadEstado(
-		estado: EstadoReclamo
+		estado: EstadoDenuncia
 	): 'success' | 'danger' | 'info' | 'secondary' {
 		switch (estado) {
 			case 'Resuelto':
 				return 'success';
 			case 'Pendiente':
 				return 'danger';
-			case 'Investigación':
+			case 'En Proceso':
 				return 'info';
+			default:
+				return 'secondary';
+		}
+	}
+
+	obtenerSeveridadPrioridad(prioridad: PrioridadDenuncia): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
+		switch (prioridad) {
+			case 'Alta':
+				return 'danger';
+			case 'Media':
+				return 'warn';
+			case 'Baja':
+				return 'success';
 			default:
 				return 'secondary';
 		}
@@ -204,5 +278,48 @@ export class InicioComponent {
 			default:
 				return 'bg-slate-100 text-slate-700';
 		}
+	}
+
+	private cargarDenuncias(): void {
+		this.cargando.set(true);
+
+		this._mainService
+			.post_Main_ObtenerDenuncias()
+			.subscribe({
+				next: (response) => {
+					this.denuncias.set(response.body?.lstItem ?? []);
+				},
+				error: () => {
+					this.denuncias.set([]);
+					this.cargando.set(false);
+				},
+				complete: () => {
+					this.cargando.set(false);
+				}
+			});
+	}
+
+	private obtenerNombreCampus(filial: string | number | null | undefined): string {
+		if (filial === null || filial === undefined || filial === '') {
+			return 'Sin campus';
+		}
+
+		return this.campusPorFilial[String(filial)] ?? `Filial ${filial}`;
+	}
+
+	private calcularPorcentaje(valor: number, total: number): number {
+		if (total === 0) {
+			return 0;
+		}
+
+		return Number(((valor / total) * 100).toFixed(1));
+	}
+
+	private redondearPorcentaje(valor: number, total: number): string {
+		return `${this.calcularPorcentaje(valor, total)}%`;
+	}
+
+	private tieneOtraAreaMarcada(denuncia: Denuncia): boolean {
+		return Object.values(denuncia.otraArea).some(Boolean);
 	}
 }

@@ -3,8 +3,10 @@ import {Injectable} from '@angular/core';
 import {environment} from '@environment/environment';
 import {ResponseResultLst} from '@interface/responseResult.interface';
 import {GlobalService} from '@shared/services/global.service';
-import {Observable} from 'rxjs';
+import {Observable, delay, of} from 'rxjs';
 import {ObtenerDatosPersonales} from '../interface/principal';
+import {Denuncia} from '../interface/denuncias.interface';
+import {DENUNCIAS_MOCK} from './denuncias.mock';
 @Injectable({
 	providedIn: 'root',
 })
@@ -23,5 +25,25 @@ export class MainService extends GlobalService {
 			headers: this.headers_a_json,
 			observe: 'response',
 		});
+	}
+
+	post_Main_ObtenerDenuncias(): Observable<HttpResponse<ResponseResultLst<Denuncia>>> {
+		const body: ResponseResultLst<Denuncia> = {
+			lstItem: DENUNCIAS_MOCK,
+			pagination: {
+				pageIndex: 1,
+				pageSize: DENUNCIAS_MOCK.length,
+				totalRows: DENUNCIAS_MOCK.length,
+			},
+			isSuccess: true,
+			lstError: [],
+			ticket: 'mock-denuncias',
+			clientName: 'local',
+			userName: 'local',
+			serverName: 'local',
+			resultado: 1,
+		};
+
+		return of(new HttpResponse({ status: 200, body })).pipe(delay(500));
 	}
 }

@@ -6,17 +6,21 @@
           Defensoría Universitaria
         </h1>
         <p class="mt-1 text-sm text-slate-600 md:text-base">
-          Seguimiento y optimización en la atención de casos de la comunidad universitaria.
+          Seguimiento y visualización de denuncias registradas por la comunidad universitaria.
         </p>
       </div>
 
       <div class="w-full max-w-xs">
         <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Filtro de campus
+          Filtrar últimos casos por campus
         </label>
 
         <p-select [options]="opcionesCampus()" [formControl]="campusControl" optionLabel="label"
-          placeholder="Selecciona un campus" class="w-full" appendTo="body" />
+          placeholder="Todos los campus" class="w-full" appendTo="body" />
+
+        <p class="mt-2 text-xs text-slate-500">
+          Muestra hasta 5 reclamos o denuncias recientes del campus seleccionado.
+        </p>
       </div>
     </header>
 
@@ -56,7 +60,7 @@
         <div class="mb-6 flex items-center justify-between">
           <h2 class="text-xl font-bold text-slate-900">Distribución por tipo de usuario</h2>
           <button type="button"
-            pTooltip="Distribución de usuarios según su tipo dentro del sistema. Los porcentajes representan la proporción sobre el total."
+            pTooltip="Distribución de denuncias según el tipo de usuario registrado en el formulario. Los porcentajes representan la proporción sobre el total cargado."
             tooltipPosition="top"
             class="flex h-6 w-6 items-center justify-center rounded-full border border-solid border-slate-300 text-xs font-bold text-slate-400 transition hover:bg-slate-50"
             aria-label="Información sobre la distribución de usuarios">
@@ -95,27 +99,31 @@
 
       <article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 class="text-xl font-bold text-slate-900">Reclamos recientes</h2>
+          <h2 class="text-xl font-bold text-slate-900">Denuncias recientes</h2>
 
           <div class="flex items-center gap-2">
             <button pButton type="button" label="Exportar CSV" severity="secondary" size="small"
               class="!rounded-xl"></button>
 
-            <button pButton type="button" label="Ver todos" size="small" class="!rounded-xl"></button>
+            <button pButton type="button" [label]="mostrarTodos() ? 'Ver menos' : 'Ver todos'" size="small"
+              class="!rounded-xl" (click)="alternarVerTodos()"></button>
           </div>
         </div>
 
-        <p-table [value]="reclamosFiltrados()" [tableStyle]="{ 'min-width': '100%' }" styleClass="p-datatable-sm">
+        <p-table [value]="denunciasFiltradas()" [tableStyle]="{ 'min-width': '100%' }" styleClass="p-datatable-sm">
           <ng-template pTemplate="header">
             <tr class="text-sm uppercase tracking-[0.18em] text-slate-400">
               <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
-                ID de referencia
+                Expediente
               </th>
               <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
-                Fecha de envío
+                Fecha de registro
               </th>
               <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
                 Campus
+              </th>
+              <th class="!bg-transparent !px-3 !py-3 !text-left !border-0 !border-b !border-slate-300 !border-solid">
+                Prioridad
               </th>
               <th class="!bg-transparent !px-3 !py-3 !text-right !border-0 !border-b !border-slate-300 !border-solid">
                 Estado
@@ -123,22 +131,27 @@
             </tr>
           </ng-template>
 
-          <ng-template pTemplate="body" let-reclamo>
+          <ng-template pTemplate="body" let-denuncia>
             <tr class="hover:bg-slate-50 transition-colors duration-150">
               <td class="!px-3 !py-4 !border-0 !border-b !border-slate-200 !border-solid">
-                <span class="font-bold text-slate-800">{{ reclamo.id }}</span>
+                <span class="font-bold text-slate-800">{{ denuncia.expediente }}</span>
               </td>
 
               <td class="!px-3 !py-4 text-slate-600 !border-0 !border-b !border-slate-200 !border-solid">
-                {{ reclamo.fechaEnvio | date: 'dd MMM, yyyy' }}
+                {{ denuncia.fecha | date: 'dd MMM, yyyy' }}
               </td>
 
               <td class="!px-3 !py-4 text-slate-700 !border-0 !border-b !border-slate-200 !border-solid">
-                {{ reclamo.campus }}
+                {{ denuncia.campus }}
+              </td>
+
+              <td class="!px-3 !py-4 !border-0 !border-b !border-slate-200 !border-solid">
+                <p-tag [value]="denuncia.prioridad" [severity]="obtenerSeveridadPrioridad(denuncia.prioridad)"
+                  styleClass="!rounded-full !px-3 !py-1 !text-xs !font-semibold"></p-tag>
               </td>
 
               <td class="!px-3 !py-4 text-right !border-0 !border-b !border-slate-200 !border-solid">
-                <p-tag [value]="reclamo.estado" [severity]="obtenerSeveridadEstado(reclamo.estado)"
+                <p-tag [value]="denuncia.estado" [severity]="obtenerSeveridadEstado(denuncia.estado)"
                   styleClass="!rounded-full !px-3 !py-1 !text-xs !font-semibold"></p-tag>
               </td>
             </tr>
