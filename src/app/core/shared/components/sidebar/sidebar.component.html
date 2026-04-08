@@ -1,12 +1,12 @@
 <div class="z-50 w-full h-full relative top-0 left-0">
 	<!-- #region NavBar -->
-	<div class="bg-white h-16 border-0 z-50 border-b border-[#cbd5e1] border-solid flex flex-row justify-between items-center px-4">
+	<div
+		class="bg-white h-16 border-0 z-50 border-b border-[#cbd5e1] border-solid flex flex-row justify-between items-center px-4">
 		<div class="flex flex-row items-center justify-center gap-2">
 			<div class="w-12 h-12">
 				<img src="assets/logo/logo_trilce.svg" alt="logo-ucv" class="w-full h-full" />
 			</div>
-			<div
-				(click)="toogleSidebar()"
+			<div (click)="toogleSidebar()"
 				class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-default min-w-12 min-h-12 rounded-xl transition-all duration-300 ease-in-out">
 				<div class="text-2xl p-2 ti ti-menu-2"></div>
 			</div>
@@ -23,82 +23,71 @@
 				<span class="text-textDefault text-s font-semibold">Menú</span>
 				<!-- #region Menu -->
 				@for (menu of menuSidebarShow(); track menu.id) {
-					<div
-						(click)="menu?.action && menu?.action(); abrirMenu(menu)"
-						[routerLink]="menu.path"
-						[routerLinkActive]="['text-white', 'bg-primary']"
-						class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-accent min-w-12 min-h-12 rounded-xl hover:text-white transition-all duration-300 ease-in-out navbar-item">
-						<div class="text-2xl p-2 ti" [ngClass]="'ti-' + menu.icon"></div>
-						<div class="tooltip">{{ menu.name }}</div>
-					</div>
+				<div (click)="menu?.action && menu?.action(); abrirMenu(menu)" [routerLink]="menu.path"
+					[routerLinkActive]="['text-white', 'bg-primary']"
+					class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-accent min-w-12 min-h-12 rounded-xl hover:text-white transition-all duration-300 ease-in-out navbar-item">
+					<div class="text-2xl p-2 ti" [ngClass]="'ti-' + menu.icon"></div>
+					<div class="tooltip">{{ menu.name }}</div>
+				</div>
 				}
 			</div>
 			<!-- #region Menu Footer -->
 
 			<div class="pt-4 pb-4 flex flex-col gap-2 items-center">
 				@for (menuFooter of menuSidebarFooter(); track menuFooter) {
-					<div
-						(click)="menuFooter?.action && menuFooter?.action();"
-						[routerLink]="menuFooter.path"
-						[routerLinkActive]="['text-white', 'bg-accent']"
-						class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-accent min-w-12 min-h-12 rounded-xl hover:text-white transition-all duration-300 ease-in-out navbar-item">
-						<div class="text-2xl p-2 ti" [ngClass]="'ti-' + menuFooter.icon"></div>
-						<div class="tooltip">{{ menuFooter.name }}</div>
-					</div>
+				<div (click)="menuFooter?.action && menuFooter?.action();" [routerLink]="menuFooter.path"
+					[routerLinkActive]="['text-white', 'bg-accent']"
+					class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-accent min-w-12 min-h-12 rounded-xl hover:text-white transition-all duration-300 ease-in-out navbar-item">
+					<div class="text-2xl p-2 ti" [ngClass]="'ti-' + menuFooter.icon"></div>
+					<div class="tooltip">{{ menuFooter.name }}</div>
+				</div>
 				}
 			</div>
 		</div>
-		<div
-			[ngClass]="showSidebar() ? 'w-[calc(100%-80px)]' : 'w-full'"
-			class="z-10 h-[calc(100vh-64px)] overflow-y-auto transition-all duration-300 ease-in-out">
+		<div class="z-10 flex-1 min-w-0 h-[calc(100vh-64px)] overflow-y-auto transition-all duration-300 ease-in-out">
 			<ng-content></ng-content>
 		</div>
 	</div>
 	@for (menu of menuSidebarShow(); track menu.id) {
-		@if (showSidebar() && menu.childrem && menu.view) {
-			<div class="z-40 absolute h-[calc(100vh-64px)] top-16 left-20 p-4 flex flex-col gap-2 bg-white w-[240px] shadow-lg" @animations>
-				<div class="text-textPrimary text-base font-semibold flex flex-row gap-2 items-start w-full justify-between">
-					<span>{{ menu.name }}</span>
-					<div
-						(click)="abrirMenu(menu)"
-						class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-default min-w-12 min-h-12 rounded-xl transition-all duration-300 ease-in-out">
-						<div class="text-2xl p-2 ti ti-chevron-left"></div>
-					</div>
-				</div>
-				@for (childrem of menu.childrem; track childrem.name) {
-					<div
-						(click)="childrem?.action && childrem?.action();  abrirMenu2(menu, childrem)"
-						[routerLink]="childrem.path"
-						[routerLinkActive]="['text-accent']"
-						class="text-m font-medium flex flex-row justify-between text-textDefault items-center cursor-pointer hover:text-accent min-w-12 min-h-5 rounded-xl transition-all duration-300 ease-in-out">
-						<div class="flex flex-row items-center gap-2">
-							<span class="ti ti-point"></span>
-							<span>{{ childrem.name }}</span>
-						</div>
-						<div>
-							@if (childrem.childrem !== undefined) {
-								<span class="text-xl ti" [ngClass]="childrem.view ? 'ti-chevron-up' : 'ti-chevron-down'"></span>
-							}
-						</div>
-					</div>
-					@if (childrem.view) {
-						<div @animations>
-							@for (capa3 of childrem.childrem; track capa3) {
-								<div
-									(click)="capa3?.action && capa3?.action();"
-									[routerLink]="capa3.path"
-									[routerLinkActive]="['text-accent']"
-									class="pl-4 text-m font-medium flex flex-row justify-between text-textDefault items-center cursor-pointer hover:text-accent min-w-12 min-h-5 rounded-xl transition-all duration-300 ease-in-out">
-									<div class="flex flex-row items-center gap-2">
-										<span class="ti ti-chevron-right"></span>
-										<span>{{ capa3.name }}</span>
-									</div>
-								</div>
-							}
-						</div>
-					}
+	@if (showSidebar() && menu.childrem && menu.view) {
+	<div class="z-40 absolute h-[calc(100vh-64px)] top-16 left-20 p-4 flex flex-col gap-2 bg-white w-[240px] shadow-lg"
+		@animations>
+		<div class="text-textPrimary text-base font-semibold flex flex-row gap-2 items-start w-full justify-between">
+			<span>{{ menu.name }}</span>
+			<div (click)="abrirMenu(menu)"
+				class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-default min-w-12 min-h-12 rounded-xl transition-all duration-300 ease-in-out">
+				<div class="text-2xl p-2 ti ti-chevron-left"></div>
+			</div>
+		</div>
+		@for (childrem of menu.childrem; track childrem.name) {
+		<div (click)="childrem?.action && childrem?.action();  abrirMenu2(menu, childrem)" [routerLink]="childrem.path"
+			[routerLinkActive]="['text-accent']"
+			class="text-m font-medium flex flex-row justify-between text-textDefault items-center cursor-pointer hover:text-accent min-w-12 min-h-5 rounded-xl transition-all duration-300 ease-in-out">
+			<div class="flex flex-row items-center gap-2">
+				<span class="ti ti-point"></span>
+				<span>{{ childrem.name }}</span>
+			</div>
+			<div>
+				@if (childrem.childrem !== undefined) {
+				<span class="text-xl ti" [ngClass]="childrem.view ? 'ti-chevron-up' : 'ti-chevron-down'"></span>
 				}
 			</div>
+		</div>
+		@if (childrem.view) {
+		<div @animations>
+			@for (capa3 of childrem.childrem; track capa3) {
+			<div (click)="capa3?.action && capa3?.action();" [routerLink]="capa3.path" [routerLinkActive]="['text-accent']"
+				class="pl-4 text-m font-medium flex flex-row justify-between text-textDefault items-center cursor-pointer hover:text-accent min-w-12 min-h-5 rounded-xl transition-all duration-300 ease-in-out">
+				<div class="flex flex-row items-center gap-2">
+					<span class="ti ti-chevron-right"></span>
+					<span>{{ capa3.name }}</span>
+				</div>
+			</div>
+			}
+		</div>
 		}
+		}
+	</div>
+	}
 	}
 </div>
