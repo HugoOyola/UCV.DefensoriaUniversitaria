@@ -19,7 +19,7 @@ export const routes: Routes = [
 			{
 				path: 'inicio',
 				component: InicioComponent,
-				title: 'Inicio',
+				title: 'Dashboard Defensoría Universitaria',
 			},
 			{
 				path: 'modulo',

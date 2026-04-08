@@ -11,11 +11,11 @@ export const Sidebar: MenuSidebar[] = [
 	},
 	{
 		id: 'monitoreo-denuncias-reclamos',
-		name: 'Monitoreo de Denuncia / Reclamos',
+		name: 'Gestión Denuncias / Reclamos',
 		icon: 'clipboard-list',
 		path: '/modulo',
 		action: (): void => {
-			console.log('Monitoreo de Denuncia / Reclamos');
+			console.log('Gestión Denuncias / Reclamos');
 		},
 		childrem: [
 			{
@@ -67,10 +67,10 @@ export const Sidebar: MenuSidebar[] = [
 	},
 	{
 		id: 'gestion-usuario',
-		name: 'Gestion de Usuario',
+		name: 'Gestión de Usuarios',
 		icon: 'users',
 		action: (): void => {
-			console.log('Gestion de Usuario');
+			console.log('Gestión de Usuarios');
 		},
 	},
 	{
