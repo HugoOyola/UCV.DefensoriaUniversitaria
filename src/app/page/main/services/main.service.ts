@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {environment} from '@environment/environment';
 import {ResponseResultLst} from '@interface/responseResult.interface';
 import {GlobalService} from '@shared/services/global.service';
-import {Observable, delay, of} from 'rxjs';
+import {Observable, delay, map, of} from 'rxjs';
 import {ObtenerDatosPersonales} from '../interface/principal';
 import {Denuncia} from '../interface/denuncias.interface';
 import {DENUNCIAS_MOCK} from './denuncias.mock';
@@ -45,5 +45,30 @@ export class MainService extends GlobalService {
 		};
 
 		return of(new HttpResponse({ status: 200, body })).pipe(delay(500));
+	}
+
+	// ─── Métodos para denuncias ──────────────────────────────────────────────────
+	/**
+	 * Obtiene la lista de denuncias
+	 * Por ahora usa datos mock, pero mantiene la estructura Observable para
+	 * facilitar la migración futura a una API
+	 */
+	getDenuncias(): Observable<Denuncia[]> {
+		return this.post_Main_ObtenerDenuncias().pipe(
+			map((response) => response.body?.lstItem ?? [])
+		);
+	}
+
+	/**
+	 * Obtiene una denuncia por su expediente
+	 * @param expediente Código de expediente (ej: DEF-2025-001)
+	 */
+	getDenunciaByExpediente(expediente: string): Observable<Denuncia | undefined> {
+		// TODO: Cuando esté lista la API, reemplazar esto con:
+		// const url = this.TrilcePrincipal.url + this.TrilcePrincipal.endpoints.Denuncias_ObtenerPorExpediente;
+		// return this._http.post<Denuncia>(url, { expediente }, { headers: this.headers_a_json });
+
+		const denuncia = DENUNCIAS_MOCK.find(d => d.expediente === expediente);
+		return of(denuncia);
 	}
 }
