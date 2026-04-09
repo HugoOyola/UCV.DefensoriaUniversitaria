@@ -243,23 +243,30 @@ export class GestionComponent {
     this.mostrarModalResponder.set(true);
   }
 
-  cerrarModalResponder(): void {
-    this.mostrarModalResponder.set(false);
+  onResponderVisibleChange(value: boolean): void {
+    this.mostrarModalResponder.set(value);
+
+    if (!value && !this.mostrarModalDetalle()) {
+      this.complaintSeleccionado.set(null);
+    }
   }
 
-  manejarEnvioRespuesta(): void {
+  manejarEnvioRespuesta(updatedComplaint: Denuncia): void {
     const complaint = this.complaintSeleccionado();
-    if (!complaint) return;
+    if (!complaint) {
+      return;
+    }
 
     this.complaints.update((lista) =>
       lista.map((item) =>
         item.expediente === complaint.expediente
-          ? { ...item, estado: 'En Proceso' }
+          ? { ...updatedComplaint }
           : item
       )
     );
 
-    this.cerrarModalResponder();
+    this.complaintSeleccionado.set(updatedComplaint);
+    this.mostrarModalResponder.set(false);
   }
 
   derivarComplaint(complaint: Denuncia): void {
