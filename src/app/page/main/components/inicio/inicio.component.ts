@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -74,6 +75,7 @@ interface MetricaInferior {
 })
 export class InicioComponent {
 	private readonly _mainService = inject(MainService);
+	private readonly _router = inject(Router);
 	private static readonly LIMITE_DENUNCIAS = 5;
 
 	private readonly campusPorFilial: Record<string, string> = {
@@ -94,7 +96,6 @@ export class InicioComponent {
 
 	public readonly denuncias = signal<Denuncia[]>([]);
 	public readonly cargando = signal<boolean>(true);
-	public readonly mostrarTodos = signal<boolean>(false);
 	public readonly opcionesCampus = computed<OpcionCampus[]>(() => {
 		const opciones = Array.from(
 			new Set(this.denuncias().map((denuncia) => this.obtenerNombreCampus(denuncia.filial)))
@@ -189,10 +190,6 @@ export class InicioComponent {
 				? this.denunciasRecientes()
 				: this.denunciasRecientes().filter((denuncia) => denuncia.campus === campus);
 
-		if (this.mostrarTodos()) {
-			return denunciasFiltradas;
-		}
-
 		return denunciasFiltradas.slice(0, InicioComponent.LIMITE_DENUNCIAS);
 	});
 
@@ -231,14 +228,13 @@ export class InicioComponent {
 	constructor() {
 		effect(() => {
 			this.campusSeleccionado();
-			this.mostrarTodos.set(false);
 		});
 
 		this.cargarDenuncias();
 	}
 
-	alternarVerTodos(): void {
-		this.mostrarTodos.update((valorActual) => !valorActual);
+	irAGestion(): void {
+		void this._router.navigate(['/gestion']);
 	}
 
 	obtenerSeveridadEstado(
