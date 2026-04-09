@@ -1,24 +1,13 @@
 <div class="w-full h-full relative top-0 left-0">
-	<!-- NavBar -->
-	<div
-		class="bg-white h-16 border-0 z-20 border-b border-[#cbd5e1] border-solid flex flex-row justify-between items-center px-4 relative">
-		<div class="flex flex-row items-center justify-center gap-2">
-			<div class="w-12 h-12">
-				<img src="assets/logo/logo_trilce.svg" alt="logo-ucv" class="w-full h-full" />
-			</div>
-			<div (click)="toogleSidebar()"
-				class="flex justify-center text-textDefault items-center cursor-pointer hover:bg-default min-w-12 min-h-12 rounded-xl transition-all duration-300 ease-in-out">
-				<div class="text-2xl p-2 ti ti-menu-2"></div>
-			</div>
-		</div>
-		<div>Defensoría Universitaria</div>
-		<div>End</div>
+	<div (click)="toogleSidebar()"
+		class="absolute top-4 left-4 z-30 bg-white border border-solid border-[#cbd5e1] shadow-lg flex justify-center text-textDefault items-center cursor-pointer hover:bg-default w-12 h-12 rounded-xl transition-all duration-300 ease-in-out">
+		<div class="text-2xl p-2 ti ti-menu-2"></div>
 	</div>
 
 	<!-- Sidebar -->
 	<div class="flex flex-row">
 		<div
-			class="z-20 bg-white relative h-[calc(100vh-64px)] border-0 border-r border-solid border-[#cbd5e1] flex flex-col justify-between transition-all duration-300 ease-in-out shadow-lg"
+			class="z-20 bg-white relative h-screen border-0 border-r border-solid border-[#cbd5e1] flex flex-col justify-between transition-all duration-300 ease-in-out shadow-lg pt-20"
 			[class.translate-x-0]="showSidebar()" [class.w-[80px]]="showSidebar()" [class.-translate-x-20]="!showSidebar()"
 			[class.w-[0px]]="!showSidebar()">
 			<div class="pt-4 pb-8 flex flex-col gap-2 items-center">
@@ -46,14 +35,14 @@
 			</div>
 		</div>
 
-		<div class="z-10 flex-1 min-w-0 h-[calc(100vh-64px)] overflow-y-auto transition-all duration-300 ease-in-out">
+		<div class="z-10 flex-1 min-w-0 h-screen overflow-y-auto transition-all duration-300 ease-in-out">
 			<ng-content></ng-content>
 		</div>
 	</div>
 
 	@for (menu of menuSidebarShow(); track menu.id) {
 	@if (showSidebar() && menu.childrem && menu.view) {
-	<div class="z-10 absolute h-[calc(100vh-64px)] top-16 left-20 p-4 flex flex-col gap-2 bg-white w-[240px] shadow-lg"
+	<div class="z-10 absolute h-screen top-0 left-20 p-4 pt-20 flex flex-col gap-2 bg-white w-[240px] shadow-lg"
 		@animations>
 		<div class="text-textPrimary text-base font-semibold flex flex-row gap-2 items-start w-full justify-between">
 			<span>{{ menu.name }}</span>
