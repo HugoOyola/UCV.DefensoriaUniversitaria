@@ -227,6 +227,17 @@ export class GestionComponent {
     }
   }
 
+  onGuardarCambios(updatedComplaint: Denuncia): void {
+    this.complaints.update((lista) =>
+      lista.map((item) =>
+        item.expediente === updatedComplaint.expediente ? { ...updatedComplaint } : item
+      )
+    );
+
+    this.complaintSeleccionado.set(updatedComplaint);
+    this.mostrarModalDetalle.set(false);
+  }
+
   responderComplaint(complaint: Denuncia): void {
     this.complaintSeleccionado.set(complaint);
     this.mostrarModalResponder.set(true);

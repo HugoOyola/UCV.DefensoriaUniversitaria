@@ -294,6 +294,6 @@
   </p-card>
 
   <app-gestion-modales [detalleVisible]="mostrarModalDetalle()" [complaint]="complaintSeleccionado()"
-    (detalleVisibleChange)="onDetalleVisibleChange($event)">
+    (detalleVisibleChange)="onDetalleVisibleChange($event)" (guardarCambios)="onGuardarCambios($event)">
   </app-gestion-modales>
 </section>
