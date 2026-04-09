@@ -7,11 +7,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { GestionModalesComponent } from '@app/page/main/components/gestion/modales/gestion-modales.component';
+import { GestionarModalComponent } from '@app/page/main/components/gestion/modales/gestionar/gestionar-modal.component';
+import { ResponderModalComponent } from '@app/page/main/components/gestion/modales/responder/responder-modal.component';
+import { DerivarModalComponent } from '@app/page/main/components/gestion/modales/derivar/derivar-modal.component';
 import { SkeletonComponent } from '@shared/components/skeleon/skeleton.component';
 import { MainService } from '../../services/main.service';
 import {
   Denuncia,
+  DerivacionDenuncia,
   EstadoDenuncia,
   PrioridadDenuncia,
   TipoUsuarioDenuncia,
@@ -46,7 +49,9 @@ type PrioridadUi = {
     TableModule,
     TooltipModule,
     SkeletonComponent,
-    GestionModalesComponent,
+    GestionarModalComponent,
+    ResponderModalComponent,
+    DerivarModalComponent,
   ],
   templateUrl: './gestion.component.html',
   styleUrl: './gestion.component.scss',
@@ -274,7 +279,20 @@ export class GestionComponent {
     this.mostrarModalDerivar.set(true);
   }
 
-  cerrarModalDerivar(): void {
+  onDerivarVisibleChange(value: boolean): void {
+    this.mostrarModalDerivar.set(value);
+    if (!value && !this.mostrarModalDetalle() && !this.mostrarModalResponder()) {
+      this.complaintSeleccionado.set(null);
+    }
+  }
+
+  manejarDerivacion(derivacion: DerivacionDenuncia): void {
+    this.complaints.update((lista) =>
+      lista.map((item) => {
+        if (item.expediente !== derivacion.expediente) return item;
+        return { ...item, estado: 'En Proceso' as EstadoDenuncia, asignado: derivacion.destinoId };
+      })
+    );
     this.mostrarModalDerivar.set(false);
   }
 

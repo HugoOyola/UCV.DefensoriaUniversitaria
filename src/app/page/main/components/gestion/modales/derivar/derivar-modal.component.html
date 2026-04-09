@@ -1,0 +1,158 @@
+<app-modal [visible]="visible()" (visibleChange)="onVisibleChange($event)"
+  [title]="modalTitle()" subtitle="Redirige el caso a otra área o programa académico"
+  [badge]="modalBadge()" icon="pi pi-arrow-right-arrow-left" [dialogWidth]="'54rem'"
+  [maximizable]="false" [dismissableMask]="true" [closable]="true">
+
+  @if (complaint(); as currentComplaint) {
+  <div class="space-y-4">
+
+    <!-- Resumen del expediente -->
+    <div class="rounded-2xl border border-solid border-slate-200 bg-white p-4 shadow-sm">
+      <h4 class="text-sm font-bold uppercase tracking-[0.12em] text-slate-700">Expediente a derivar</h4>
+      <p class="mt-1 text-xs text-slate-500">Información del caso que será redirigido</p>
+
+      <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Expediente</p>
+          <p class="mt-1 text-sm font-bold text-slate-800">{{ currentComplaint.expediente }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2 sm:col-span-1 lg:col-span-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Denunciante</p>
+          <p class="mt-1 text-sm font-semibold text-slate-800">{{ currentComplaint.nombre }} {{ currentComplaint.apellidos }}</p>
+          <p class="text-xs text-slate-500">{{ currentComplaint.email }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Filial</p>
+          <p class="mt-1 text-sm text-slate-800">{{ getCampusLabel(currentComplaint.filial) }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Tipo de usuario</p>
+          <p class="mt-1 text-sm text-slate-800">{{ getTipoUsuarioLabel(currentComplaint.tipoUsuario) }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Asignado actualmente</p>
+          <p class="mt-1 text-sm text-slate-800">{{ currentComplaint.asignado || 'Sin asignar' }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Estado</p>
+          <p class="mt-1 text-sm font-semibold text-slate-800">{{ currentComplaint.estado }}</p>
+        </div>
+
+        <div class="rounded-xl border border-solid border-slate-200 bg-slate-50 px-3 py-2">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Prioridad</p>
+          <p class="mt-1 text-sm font-semibold text-slate-800">{{ currentComplaint.prioridad }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de derivación -->
+    <div class="rounded-2xl border border-solid border-slate-200 bg-white p-4 shadow-sm">
+      <h4 class="text-sm font-bold uppercase tracking-[0.12em] text-slate-700">Configuración de la derivación</h4>
+      <p class="mt-1 text-xs text-slate-500">Define el destino y el motivo de la reasignación</p>
+
+      <div class="mt-4 space-y-4">
+
+        <!-- Tipo de destino -->
+        <div>
+          <p class="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Tipo de destino</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button"
+              class="flex items-center justify-center gap-2 rounded-xl border border-solid px-3 py-3 text-sm font-medium transition-colors"
+              [class]="tipoDestino() === 'area'
+                ? 'border-sky-300 bg-sky-50 text-sky-700'
+                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'"
+              (click)="onTipoDestinoChange('area')">
+              <i class="pi pi-building"></i>
+              Área administrativa
+            </button>
+            <button type="button"
+              class="flex items-center justify-center gap-2 rounded-xl border border-solid px-3 py-3 text-sm font-medium transition-colors"
+              [class]="tipoDestino() === 'programa'
+                ? 'border-violet-300 bg-violet-50 text-violet-700'
+                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'"
+              (click)="onTipoDestinoChange('programa')">
+              <i class="pi pi-book"></i>
+              Programa académico
+            </button>
+          </div>
+        </div>
+
+        <!-- Destino específico -->
+        <div>
+          <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">
+            {{ tipoDestino() === 'area' ? 'Área de destino' : 'Programa académico de destino' }}
+            <span class="text-red-500">*</span>
+          </p>
+          <p-select class="w-full border border-solid border-slate-300 bg-white"
+            [options]="destinoOptions()" optionLabel="label" optionValue="value"
+            [ngModel]="destinoId()" (ngModelChange)="destinoId.set($event)"
+            [placeholder]="tipoDestino() === 'area' ? 'Seleccione un área' : 'Seleccione un programa'">
+          </p-select>
+        </div>
+
+        <!-- Motivo -->
+        <div>
+          <div class="mb-1 flex items-center justify-between">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">
+              Motivo de la derivación <span class="text-red-500">*</span>
+            </p>
+            <span class="text-xs text-slate-400">{{ motivo().trim().length }} caracteres</span>
+          </div>
+          <textarea pTextarea rows="4"
+            class="w-full rounded-xl border border-solid border-slate-300 bg-white px-3 py-2 text-sm text-slate-800"
+            [ngModel]="motivo()" (ngModelChange)="motivo.set($event)"
+            placeholder="Describe el motivo por el cual se deriva este caso..."></textarea>
+          @if (motivo().trim().length > 0 && motivo().trim().length < 10) {
+          <p class="mt-1 text-xs text-red-600">El motivo debe tener al menos 10 caracteres.</p>
+          }
+        </div>
+
+        <!-- Vista previa del destino seleccionado -->
+        @if (destinoSeleccionadoLabel()) {
+        <div class="rounded-xl border border-solid border-sky-200 bg-sky-50 px-4 py-3">
+          <div class="flex items-start gap-3">
+            <i class="pi pi-arrow-right-arrow-left mt-0.5 text-sky-600"></i>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold text-sky-700">Destino seleccionado</p>
+              <p class="mt-1 text-sm font-bold text-slate-800">{{ destinoSeleccionadoLabel() }}</p>
+              <p class="mt-0.5 text-xs text-slate-500 capitalize">
+                {{ tipoDestino() === 'area' ? 'Área administrativa' : 'Programa académico' }}
+              </p>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Aviso -->
+    <div class="rounded-xl border border-solid border-orange-200 bg-orange-50 p-3">
+      <p class="mb-1 text-sm font-semibold text-orange-800">
+        <i class="pi pi-exclamation-triangle mr-1"></i> Consideraciones
+      </p>
+      <ul class="list-disc pl-5 text-xs text-orange-800 space-y-0.5">
+        <li>El caso será reasignado al área o programa seleccionado.</li>
+        <li>Se notificará al responsable del destino sobre la derivación.</li>
+        <li>El motivo quedará registrado en el historial del expediente.</li>
+        <li>El estado del caso se actualizará a <strong>En Proceso</strong>.</li>
+      </ul>
+    </div>
+
+  </div>
+  }
+
+  <div modal-footer>
+    <div class="flex flex-wrap justify-end gap-2">
+      <p-button label="Cancelar" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="close()">
+      </p-button>
+      <p-button label="Confirmar Derivación" icon="pi pi-arrow-right-arrow-left"
+        [disabled]="!puedeConfirmar()" (onClick)="confirmar()">
+      </p-button>
+    </div>
+  </div>
+</app-modal>

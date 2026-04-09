@@ -293,9 +293,24 @@
     </ng-template>
   </p-card>
 
-  <app-gestion-modales [detalleVisible]="mostrarModalDetalle()" [complaint]="complaintSeleccionado()"
-    [responderVisible]="mostrarModalResponder()" (detalleVisibleChange)="onDetalleVisibleChange($event)"
-    (responderVisibleChange)="onResponderVisibleChange($event)" (guardarCambios)="onGuardarCambios($event)"
+  <app-gestionar-modal
+    [visible]="mostrarModalDetalle()"
+    [complaint]="complaintSeleccionado()"
+    (visibleChange)="onDetalleVisibleChange($event)"
+    (guardarCambios)="onGuardarCambios($event)">
+  </app-gestionar-modal>
+
+  <app-responder-modal
+    [visible]="mostrarModalResponder()"
+    [complaint]="complaintSeleccionado()"
+    (visibleChange)="onResponderVisibleChange($event)"
     (enviarRespuesta)="manejarEnvioRespuesta($event)">
-  </app-gestion-modales>
+  </app-responder-modal>
+
+  <app-derivar-modal
+    [visible]="mostrarModalDerivar()"
+    [complaint]="complaintSeleccionado()"
+    (visibleChange)="onDerivarVisibleChange($event)"
+    (confirmarDerivacion)="manejarDerivacion($event)">
+  </app-derivar-modal>
 </section>
