@@ -1,0 +1,131 @@
+<section class="bg-slate-100 p-4 md:p-6 min-h-full">
+	<div class="mx-auto max-w-screen-2xl space-y-6">
+		<header class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm overflow-hidden relative">
+			<div class="absolute -top-10 -right-8 h-24 w-24 rounded-full bg-emerald-100 opacity-80"></div>
+			<div class="absolute -bottom-10 right-16 h-24 w-24 rounded-full bg-cyan-100 opacity-70"></div>
+			<h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Reportes de Denuncias</h1>
+			<p class="mt-1 text-sm md:text-base text-slate-600">Reporte consolidado, filtros dinamicos y exportacion CSV con base en la data mock.</p>
+		</header>
+
+		@if (cargando()) {
+			<div class="rounded-2xl border border-solid border-slate-200 bg-white p-5 text-slate-600">Cargando reportes...</div>
+		} @else if (errorCarga()) {
+			<div class="rounded-2xl border border-solid border-rose-200 bg-rose-50 p-5 text-rose-700">{{ errorCarga() }}</div>
+		} @else {
+			<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
+				<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+					<input
+						type="text"
+						class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
+						placeholder="Buscar por expediente, nombre, documento o correo"
+						[ngModel]="filtroTexto()"
+						(ngModelChange)="filtroTexto.set($event)"
+					/>
+
+					<select class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm"
+						[ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
+						<option value="Todos">Todos los estados</option>
+						<option value="Pendiente">Pendiente</option>
+						<option value="En Proceso">En Proceso</option>
+						<option value="Resuelto">Resuelto</option>
+					</select>
+
+					<select class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm"
+						[ngModel]="filtroPrioridad()" (ngModelChange)="filtroPrioridad.set($event)">
+						<option value="Todos">Todas las prioridades</option>
+						<option value="Alta">Alta</option>
+						<option value="Media">Media</option>
+						<option value="Baja">Baja</option>
+					</select>
+
+					<select class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm"
+						[ngModel]="filtroCampus()" (ngModelChange)="filtroCampus.set($event)">
+						@for (campus of opcionesCampus(); track campus) {
+							<option [value]="campus">{{ campus }}</option>
+						}
+					</select>
+
+					<div class="flex gap-2">
+						<button type="button" class="flex-1 rounded-xl bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-700"
+							(click)="limpiarFiltros()">Limpiar</button>
+						<button type="button" class="flex-1 rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white"
+							(click)="exportarCsv()">Exportar CSV</button>
+					</div>
+				</div>
+			</article>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+				<article class="rounded-2xl border border-solid border-slate-800 bg-gradient-to-br from-slate-900 to-slate-700 p-5 shadow-sm">
+					<p class="text-sm text-slate-500">Total filtrado</p>
+					<p class="mt-2 text-4xl font-extrabold text-white">{{ resumen().total }}</p>
+				</article>
+				<article class="rounded-2xl border border-solid border-rose-200 bg-white p-5 shadow-sm">
+					<p class="text-sm text-slate-500">Pendientes</p>
+					<p class="mt-2 text-4xl font-extrabold text-red-600">{{ resumen().pendientes }}</p>
+				</article>
+				<article class="rounded-2xl border border-solid border-blue-200 bg-white p-5 shadow-sm">
+					<p class="text-sm text-slate-500">En Proceso</p>
+					<p class="mt-2 text-4xl font-extrabold text-blue-600">{{ resumen().enProceso }}</p>
+				</article>
+				<article class="rounded-2xl border border-solid border-emerald-200 bg-white p-5 shadow-sm">
+					<p class="text-sm text-slate-500">Resueltos</p>
+					<p class="mt-2 text-4xl font-extrabold text-emerald-600">{{ resumen().resueltos }}</p>
+				</article>
+			</div>
+
+			<div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+				<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm overflow-x-auto">
+					<h2 class="text-lg font-bold text-slate-900 mb-4">Detalle de casos</h2>
+					<table class="w-full min-w-[760px] border-collapse">
+						<thead>
+							<tr class="text-left text-xs uppercase tracking-wider text-slate-500">
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Expediente</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Fecha</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Campus</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Estado</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Prioridad</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (item of denunciasFiltradas(); track item.expediente) {
+								<tr class="text-sm text-slate-700">
+									<td class="py-2 border-0 border-b border-solid border-slate-100 font-semibold">{{ item.expediente }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.fecha | date: 'dd/MM/yyyy' }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ obtenerCampusLabel(item.filial) }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.estado }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.prioridad }}</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</article>
+
+				<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm overflow-x-auto">
+					<h2 class="text-lg font-bold text-slate-900 mb-4">Reporte por campus</h2>
+					<table class="w-full min-w-[520px] border-collapse">
+						<thead>
+							<tr class="text-left text-xs uppercase tracking-wider text-slate-500">
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Campus</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Total</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Pendiente</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">En Proceso</th>
+								<th class="pb-2 border-0 border-b border-solid border-slate-200">Resuelto</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (item of reportePorCampus(); track item.campus) {
+								<tr class="text-sm text-slate-700">
+									<td class="py-2 border-0 border-b border-solid border-slate-100 font-semibold">{{ item.campus }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.total }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.pendientes }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.enProceso }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.resueltos }}</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</article>
+			</div>
+		}
+	</div>
+</section>

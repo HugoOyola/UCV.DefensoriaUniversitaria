@@ -1,0 +1,94 @@
+<section class="bg-slate-100 p-4 md:p-6 min-h-full">
+	<div class="mx-auto max-w-screen-2xl space-y-6">
+		<header class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
+			<div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+				<div>
+					<h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Gestion de Usuarios</h1>
+					<p class="text-sm md:text-base text-slate-600">Busca por nombre o codigo y asigna permisos del modulo con datos hardcodeados.</p>
+				</div>
+				<button
+					type="button"
+					class="rounded-xl bg-slate-900 text-white text-sm font-semibold px-4 py-2"
+					(click)="irAConfiguracion()"
+				>
+					Ir a Configuracion
+				</button>
+			</div>
+		</header>
+
+		<div class="grid grid-cols-1 xl:grid-cols-[380px_1fr] gap-4">
+			<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
+				<label class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">Buscar usuario</label>
+				<input
+					type="text"
+					class="mt-2 w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
+					placeholder="Ej: DU0002 o Carlos"
+					[ngModel]="terminoBusqueda()"
+					(ngModelChange)="terminoBusqueda.set($event)"
+				/>
+
+				<div class="mt-4 space-y-2 max-h-[560px] overflow-y-auto pr-1">
+					@for (usuario of usuariosFiltrados(); track usuario.codigo) {
+						<button
+							type="button"
+							class="w-full rounded-xl border border-solid px-3 py-3 text-left transition"
+							[class.border-blue-400]="codigoSeleccionado() === usuario.codigo"
+							[class.bg-blue-50]="codigoSeleccionado() === usuario.codigo"
+							[class.border-slate-200]="codigoSeleccionado() !== usuario.codigo"
+							(click)="seleccionarUsuario(usuario.codigo)"
+						>
+							<p class="font-semibold text-slate-800">{{ usuario.nombre }}</p>
+							<p class="text-xs text-slate-500">{{ usuario.codigo }} • {{ usuario.cargo }}</p>
+						</button>
+						}
+				</div>
+			</article>
+
+			<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
+				@if (usuarioSeleccionado(); as usuario) {
+					<div class="flex flex-col lg:flex-row lg:items-start gap-5">
+						<div class="flex items-center gap-4 min-w-[280px]">
+							<img [src]="usuario.foto" [alt]="usuario.nombre" class="h-20 w-20 rounded-2xl object-cover border border-solid border-slate-200" />
+							<div>
+								<p class="text-lg font-extrabold text-slate-900">{{ usuario.nombre }}</p>
+								<p class="text-sm text-slate-600">Codigo: <span class="font-semibold text-slate-800">{{ usuario.codigo }}</span></p>
+								<p class="text-sm text-slate-600">Cargo: <span class="font-semibold text-slate-800">{{ usuario.cargo }}</span></p>
+							</div>
+						</div>
+						<div class="rounded-xl bg-slate-100 px-3 py-2 text-sm text-slate-700">
+							Permisos asignados: <span class="font-extrabold text-slate-900">{{ usuario.permisos.length }}</span>
+						</div>
+					</div>
+
+					<div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+						@for (grupo of permisosAgrupados(); track grupo.categoria) {
+							<section class="rounded-2xl border border-solid border-slate-200 p-4 bg-slate-50">
+								<h3 class="font-bold text-slate-900 mb-3">{{ grupo.categoria }}</h3>
+								<div class="space-y-3">
+									@for (permiso of grupo.permisos; track permiso.id) {
+										<label class="flex items-start gap-3 cursor-pointer">
+											<input
+												type="checkbox"
+												class="mt-1"
+												[checked]="tienePermiso(permiso.id)"
+												(change)="togglePermiso(permiso.id)"
+											/>
+											<span>
+												<span class="block font-semibold text-sm text-slate-800">{{ permiso.nombre }}</span>
+												<span class="block text-xs text-slate-500">{{ permiso.descripcion }}</span>
+											</span>
+										</label>
+									}
+								</div>
+							</section>
+						}
+					</div>
+				} @else {
+					<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-slate-600">
+						No se encontro un usuario. Prueba con otro nombre o codigo.
+					</div>
+				}
+			</article>
+		</div>
+	</div>
+</section>

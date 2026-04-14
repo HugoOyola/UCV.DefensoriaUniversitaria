@@ -52,7 +52,7 @@ export const Sidebar: MenuSidebar[] = [
 		id: 'estadisticas',
 		name: 'Estadisticas',
 		icon: 'chart-bar',
-		path: '/uikit',
+		path: '/estadisticas',
 		action: (): void => {
 			console.log('Estadisticas');
 		},
@@ -61,6 +61,7 @@ export const Sidebar: MenuSidebar[] = [
 		id: 'reportes-1',
 		name: 'Reportes',
 		icon: 'report-analytics',
+		path: '/reportes',
 		action: (): void => {
 			console.log('Reportes');
 		},
@@ -69,22 +70,16 @@ export const Sidebar: MenuSidebar[] = [
 		id: 'gestion-usuario',
 		name: 'Gestión de Usuarios',
 		icon: 'users',
+		path: '/gestion-usuarios',
 		action: (): void => {
 			console.log('Gestión de Usuarios');
-		},
-	},
-	{
-		id: 'reportes-2',
-		name: 'Reportes',
-		icon: 'file-description',
-		action: (): void => {
-			console.log('Reportes');
 		},
 	},
 	{
 		id: 'configuracion',
 		name: 'Configuración',
 		icon: 'settings',
+		path: '/configuracion',
 		action: (): void => {
 			console.log('Configuración');
 		},

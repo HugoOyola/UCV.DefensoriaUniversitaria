@@ -237,6 +237,10 @@ export class InicioComponent {
 		void this._router.navigate(['/gestion']);
 	}
 
+	irAReportes(): void {
+		void this._router.navigate(['/reportes']);
+	}
+
 	obtenerSeveridadEstado(
 		estado: EstadoDenuncia
 	): 'success' | 'danger' | 'info' | 'secondary' {

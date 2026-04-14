@@ -2,7 +2,7 @@ import {Routes} from '@angular/router';
 import {ModulosComponent} from './page/module/modulos.component';
 import {MainComponent} from './page/main/main.component';
 import {InicioComponent} from './page/main/components/inicio/inicio.component';
-import { GestionComponent } from './page/main/components/gestion/gestion.component';
+import {GestionComponent} from './page/main/components/gestion/gestion.component';
 
 export const routes: Routes = [
 	{
@@ -25,6 +25,29 @@ export const routes: Routes = [
 				path: 'gestion',
 				component: GestionComponent,
 				title: 'Gestion de Casos - Principal',
+			},
+			{
+				path: 'estadisticas',
+				loadComponent: () =>
+					import('./page/main/components/estadisticas/estadisticas.component').then((m) => m.EstadisticasComponent),
+				title: 'Estadisticas de Denuncias',
+			},
+			{
+				path: 'reportes',
+				loadComponent: () => import('./page/main/components/reportes/reportes.component').then((m) => m.ReportesComponent),
+				title: 'Reportes de Denuncias',
+			},
+			{
+				path: 'gestion-usuarios',
+				loadComponent: () =>
+					import('./page/main/components/gestion-usuarios/gestion-usuarios.component').then((m) => m.GestionUsuariosComponent),
+				title: 'Gestion de Usuarios',
+			},
+			{
+				path: 'configuracion',
+				loadComponent: () =>
+					import('./page/main/components/configuracion/configuracion.component').then((m) => m.ConfiguracionComponent),
+				title: 'Configuracion',
 			},
 			// {
 			// 	path: 'modulo',
