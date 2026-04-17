@@ -1,10 +1,21 @@
 <section class="bg-slate-100 p-4 md:p-6 min-h-full">
-	<div class="mx-auto max-w-screen-2xl space-y-6">
-		<header class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm overflow-hidden relative">
-			<div class="absolute -top-10 -right-8 h-24 w-24 rounded-full bg-emerald-100 opacity-80"></div>
-			<div class="absolute -bottom-10 right-16 h-24 w-24 rounded-full bg-cyan-100 opacity-70"></div>
-			<h1 class="text-2xl md:text-3xl font-extrabold text-slate-900">Reportes de Denuncias</h1>
-			<p class="mt-1 text-sm md:text-base text-slate-600">Reporte consolidado, filtros dinamicos y exportacion CSV con base en la data mock.</p>
+	<div class="w-full space-y-6">
+		<header class="relative overflow-hidden rounded-3xl border border-solid border-slate-800 bg-slate-800 px-5 py-5 shadow-sm md:px-6 md:py-6">
+			<div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-slate-600/40 blur-xl"></div>
+			<div class="absolute -bottom-12 right-24 h-28 w-28 rounded-full bg-cyan-500/20 blur-xl"></div>
+
+			<div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+				<div class="flex items-start gap-4">
+					<div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-solid border-slate-500 bg-slate-600">
+						<i class="pi pi-chart-line text-lg text-slate-100"></i>
+					</div>
+					<div>
+						<span class="mb-2 inline-flex rounded-full border border-solid border-cyan-300/45 bg-cyan-300/20 px-3 py-1 text-xs font-bold tracking-[0.16em] text-cyan-100">INTELIGENCIA OPERATIVA</span>
+						<h1 class="text-2xl font-extrabold tracking-tight text-slate-100 md:text-3xl">Reportes de Denuncias</h1>
+						<p class="mt-1 text-sm text-slate-300 md:text-base">Reporte consolidado, filtros dinamicos y exportacion CSV con base en la data mock.</p>
+					</div>
+				</div>
+			</div>
 		</header>
 
 		@if (cargando()) {
@@ -13,7 +24,12 @@
 			<div class="rounded-2xl border border-solid border-rose-200 bg-rose-50 p-5 text-rose-700">{{ errorCarga() }}</div>
 		} @else {
 			<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm">
-				<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
+				<div class="mb-3 flex items-center justify-between gap-3">
+					<h2 class="text-base font-bold text-slate-900 md:text-lg">Filtros de consulta</h2>
+					<span class="rounded-lg bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">Analisis dinamico</span>
+				</div>
+
+				<div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
 					<input
 						type="text"
 						class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
@@ -46,34 +62,46 @@
 					</select>
 
 					<div class="flex gap-2">
-						<button type="button" class="flex-1 rounded-xl bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-700"
+						<button type="button" class="flex-1 rounded-xl bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-300"
 							(click)="limpiarFiltros()">Limpiar</button>
-						<button type="button" class="flex-1 rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white"
+						<button type="button" class="flex-1 rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
 							(click)="exportarCsv()">Exportar CSV</button>
 					</div>
 				</div>
 			</article>
 
-			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-				<article class="rounded-2xl border border-solid border-slate-800 bg-gradient-to-br from-slate-900 to-slate-700 p-5 shadow-sm">
-					<p class="text-sm text-slate-500">Total filtrado</p>
+			<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+				<article class="relative overflow-hidden rounded-2xl border border-solid border-slate-800 bg-gradient-to-br from-slate-900 to-slate-700 p-5 shadow-sm">
+					<div class="absolute -bottom-6 -right-4 text-slate-500/30">
+						<i class="pi pi-chart-line text-7xl"></i>
+					</div>
+					<p class="text-sm text-slate-300">Total filtrado</p>
 					<p class="mt-2 text-4xl font-extrabold text-white">{{ resumen().total }}</p>
 				</article>
 				<article class="rounded-2xl border border-solid border-rose-200 bg-white p-5 shadow-sm">
-					<p class="text-sm text-slate-500">Pendientes</p>
+					<div class="mb-2 flex items-center justify-between">
+						<p class="text-sm text-slate-500">Pendientes</p>
+						<i class="pi pi-clock text-rose-500"></i>
+					</div>
 					<p class="mt-2 text-4xl font-extrabold text-red-600">{{ resumen().pendientes }}</p>
 				</article>
 				<article class="rounded-2xl border border-solid border-blue-200 bg-white p-5 shadow-sm">
-					<p class="text-sm text-slate-500">En Proceso</p>
+					<div class="mb-2 flex items-center justify-between">
+						<p class="text-sm text-slate-500">En Proceso</p>
+						<i class="pi pi-sync text-blue-500"></i>
+					</div>
 					<p class="mt-2 text-4xl font-extrabold text-blue-600">{{ resumen().enProceso }}</p>
 				</article>
 				<article class="rounded-2xl border border-solid border-emerald-200 bg-white p-5 shadow-sm">
-					<p class="text-sm text-slate-500">Resueltos</p>
+					<div class="mb-2 flex items-center justify-between">
+						<p class="text-sm text-slate-500">Resueltos</p>
+						<i class="pi pi-check-circle text-emerald-500"></i>
+					</div>
 					<p class="mt-2 text-4xl font-extrabold text-emerald-600">{{ resumen().resueltos }}</p>
 				</article>
 			</div>
 
-			<div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+			<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
 				<article class="rounded-2xl border border-solid border-slate-200 bg-white p-5 shadow-sm overflow-x-auto">
 					<h2 class="text-lg font-bold text-slate-900 mb-4">Detalle de casos</h2>
 					<table class="w-full min-w-[760px] border-collapse">
