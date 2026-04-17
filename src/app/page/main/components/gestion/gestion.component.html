@@ -14,7 +14,8 @@
       </div>
 
       <div class="space-y-5 p-5 md:p-6">
-        <div class="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)]">
+        <div class="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.6fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)_minmax(260px,1fr)]">
+          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
           <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
           <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
           <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
@@ -69,7 +70,7 @@
 
     <ng-template pTemplate="content">
       <!-- Filtros -->
-      <div class="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.8fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)]">
+      <div class="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.6fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)_minmax(260px,1fr)]">
         <div class="relative min-w-0">
           <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           <input pInputText
@@ -89,6 +90,20 @@
             [showClear]="true" placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
             (ngModelChange)="selectedPriority.set($event)">
           </p-select>
+        </div>
+
+        <div class="min-w-0">
+          <p-datepicker
+            class="w-full"
+            selectionMode="range"
+            dateFormat="dd/mm/yy"
+            [showIcon]="true"
+            [showButtonBar]="true"
+            [readonlyInput]="true"
+            placeholder="Rango de fechas"
+            [ngModel]="selectedDateRange()"
+            (ngModelChange)="selectedDateRange.set($event)">
+          </p-datepicker>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -44,6 +45,7 @@ type PrioridadUi = {
     FormsModule,
     ButtonModule,
     CardModule,
+    DatePickerModule,
     InputTextModule,
     SelectModule,
     TableModule,
@@ -70,6 +72,7 @@ export class GestionComponent {
   public searchTerm = signal('');
   public selectedStatus = signal<EstadoDenuncia | null>(null);
   public selectedPriority = signal<PrioridadDenuncia | null>(null);
+  public selectedDateRange = signal<Date[] | null>(null);
   public cargando = signal(true);
   public errorCarga = signal<string | null>(null);
 
@@ -179,10 +182,22 @@ export class GestionComponent {
     const term = this.searchTerm().trim().toLowerCase();
     const status = this.selectedStatus();
     const priority = this.selectedPriority();
+    const dateRange = this.selectedDateRange();
+
+    const [startDate, endDate] = dateRange ?? [];
+
+    const normalizedStart = startDate
+      ? new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0)
+      : null;
+
+    const normalizedEnd = endDate
+      ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59, 999)
+      : null;
 
     return this.complaints().filter((c) => {
       const nombreCompleto = `${c.nombre} ${c.apellidos}`.toLowerCase();
       const tipoUsuarioLabel = this.getTipoUsuarioLabel(c.tipoUsuario).toLowerCase();
+      const complaintDate = new Date(c.fecha);
 
       const matchesTerm =
         !term ||
@@ -192,7 +207,16 @@ export class GestionComponent {
         c.documento.toLowerCase().includes(term) ||
         tipoUsuarioLabel.includes(term);
 
-      return (!status || c.estado === status) && (!priority || c.prioridad === priority) && matchesTerm;
+      const matchesDateRange =
+        !normalizedStart ||
+        (complaintDate >= normalizedStart && (!normalizedEnd || complaintDate <= normalizedEnd));
+
+      return (
+        (!status || c.estado === status) &&
+        (!priority || c.prioridad === priority) &&
+        matchesTerm &&
+        matchesDateRange
+      );
     });
   });
 

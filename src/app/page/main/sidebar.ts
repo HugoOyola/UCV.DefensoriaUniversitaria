@@ -16,37 +16,7 @@ export const Sidebar: MenuSidebar[] = [
 		path: '/gestion',
 		action: (): void => {
 			console.log('Gestión Denuncias / Reclamos');
-		},
-		childrem: [
-			{
-				name: 'Todas',
-				path: '/gestion',
-				action: (): void => {
-					console.log('Todas');
-				},
-			},
-			{
-				name: 'Por Revisar',
-				path: '/gestion',
-				action: (): void => {
-					console.log('Por Revisar');
-				},
-			},
-			{
-				name: 'En Proceso',
-				path: '/gestion',
-				action: (): void => {
-					console.log('En Proceso');
-				},
-			},
-			{
-				name: 'Resueltas',
-				path: '/gestion',
-				action: (): void => {
-					console.log('Resueltas');
-				},
-			},
-		],
+		}
 	},
 	{
 		id: 'estadisticas',
