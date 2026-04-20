@@ -1,6 +1,6 @@
 <p-dialog [visible]="internalVisible()" [modal]="true" [appendTo]="'body'" [baseZIndex]="12000" [autoZIndex]="true"
   [showHeader]="showHeader()" [dismissableMask]="dismissableMask()" [draggable]="false" [resizable]="false"
-  [maximizable]="maximizable()" [closable]="closable()" [breakpoints]="breakpoints()" [style]="{ width: dialogWidth() }"
+  [maximizable]="maximizable()" [closable]="closable()" [focusOnShow]="focusOnShow()" [breakpoints]="breakpoints()" [style]="{ width: dialogWidth() }"
   styleClass="ucv-dialog" (visibleChange)="onVisibleChange($event)" (onHide)="onVisibleChange(false)">
   <ng-template pTemplate="header">
     <div class="ucv-header">

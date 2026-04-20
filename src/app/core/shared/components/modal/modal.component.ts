@@ -33,6 +33,7 @@ export class ModalComponent {
   public readonly dismissableMask = input<boolean>(true);
   public readonly closable = input<boolean>(true);
   public readonly blockScroll = input<boolean>(true);
+  public readonly focusOnShow = input<boolean>(true);
   public readonly breakpoints = input<Record<string, string>>({
     '1400px': '60rem',
     '1200px': '70vw',
