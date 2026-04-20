@@ -270,6 +270,34 @@ export class GestionComponent {
     return map[tipo] ?? tipo;
   }
 
+  getAsignadoNombre(asignado: string | null | undefined): string {
+    const value = asignado?.trim() ?? '';
+    if (!value) {
+      return 'Sin asignar';
+    }
+
+    const [firstPart, secondPart] = value.split(' - ').map((item) => item.trim());
+    if (secondPart) {
+      return secondPart;
+    }
+
+    return firstPart;
+  }
+
+  getAsignadoCargo(asignado: string | null | undefined): string | null {
+    const value = asignado?.trim() ?? '';
+    if (!value) {
+      return null;
+    }
+
+    const [firstPart, secondPart] = value.split(' - ').map((item) => item.trim());
+    if (secondPart) {
+      return firstPart || null;
+    }
+
+    return null;
+  }
+
   viewComplaint(complaint: Denuncia): void {
     this.complaintSeleccionado.set(complaint);
     this.mostrarModalDetalle.set(true);

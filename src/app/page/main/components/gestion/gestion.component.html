@@ -120,6 +120,20 @@
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
           class="p-datatable-sm p-datatable-striped">
 
+          <ng-template pTemplate="colgroup">
+            <colgroup>
+              <col style="width: 10%" />
+              <col style="width: 19%" />
+              <col style="width: 12%" />
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+              <col style="width: 11%" />
+              <col style="width: 8%" />
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+            </colgroup>
+          </ng-template>
+
           <ng-template pTemplate="header">
             <tr class="bg-slate-50">
               <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
@@ -137,7 +151,7 @@
               <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
                 <div class="flex items-center justify-center gap-2">
                   <i class="pi pi-users text-slate-500"></i>
-                  Tipo Usuario
+                  Usuario
                 </div>
               </th>
               <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
@@ -155,7 +169,7 @@
               <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
                 <div class="flex items-center justify-center gap-2">
                   <i class="pi pi-calendar text-slate-500"></i>
-                  Fecha de Registro
+                  Registro
                 </div>
               </th>
               <th class="px-4 py-3 text-left text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
@@ -198,8 +212,14 @@
                     <div class="text-sm font-medium text-slate-900">
                       {{ complaint.nombre }} {{ complaint.apellidos }}
                     </div>
-                    <div class="text-sm text-slate-500">
-                      {{ complaint.email }}
+                    <div class="mt-1">
+                      <span
+                        class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                        [ngClass]="complaint.isApoderado
+                          ? 'border-amber-300 bg-amber-50 text-amber-700'
+                          : 'border-emerald-300 bg-emerald-50 text-emerald-700'">
+                        {{ complaint.isApoderado ? 'Apoderado' : 'Titular' }}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -252,9 +272,14 @@
 
               <td class="whitespace-nowrap px-4 py-4 text-center">
                 @if (complaint.asignado) {
-                <div class="text-sm text-slate-900">
-                  {{ complaint.asignado }}
+                <div class="text-sm font-medium text-slate-900">
+                  {{ getAsignadoNombre(complaint.asignado) }}
                 </div>
+                @if (getAsignadoCargo(complaint.asignado); as cargoAsignado) {
+                <div class="mt-1 text-xs text-slate-500">
+                  {{ cargoAsignado }}
+                </div>
+                }
                 } @else {
                 <span
                   class="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-400 bg-stone-50 px-2 py-1 text-sm font-medium text-stone-700">
