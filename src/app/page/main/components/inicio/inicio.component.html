@@ -205,12 +205,12 @@
               </td>
 
               <td class="!px-3 !py-4 !border-0 !border-b !border-slate-200 !border-solid">
-                <p-tag [value]="denuncia.prioridad" [severity]="obtenerSeveridadPrioridad(denuncia.prioridad)"
+                <p-tag [value]="obtenerPrioridadLabel(denuncia.prioridad)" [severity]="obtenerSeveridadPrioridad(denuncia.prioridad)"
                   styleClass="!rounded-full !px-3 !py-1 !text-xs !font-semibold"></p-tag>
               </td>
 
               <td class="!px-3 !py-4 text-right !border-0 !border-b !border-slate-200 !border-solid">
-                <p-tag [value]="denuncia.estado" [severity]="obtenerSeveridadEstado(denuncia.estado)"
+                <p-tag [value]="obtenerEstadoLabel(denuncia.estado)" [severity]="obtenerSeveridadEstado(denuncia.estado)"
                   styleClass="!rounded-full !px-3 !py-1 !text-xs !font-semibold"></p-tag>
               </td>
             </tr>

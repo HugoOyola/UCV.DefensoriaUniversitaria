@@ -45,8 +45,8 @@ interface DenunciaReciente {
 	expediente: string;
 	fecha: Date;
 	campus: string;
-	estado: EstadoDenuncia;
-	prioridad: PrioridadDenuncia;
+	estado: EstadoDenuncia | null | undefined;
+	prioridad: PrioridadDenuncia | null | undefined;
 }
 
 interface MetricaInferior {
@@ -242,7 +242,7 @@ export class InicioComponent {
 	}
 
 	obtenerSeveridadEstado(
-		estado: EstadoDenuncia
+		estado: EstadoDenuncia | null | undefined
 	): 'success' | 'danger' | 'info' | 'secondary' {
 		switch (estado) {
 			case 'Resuelto':
@@ -256,7 +256,7 @@ export class InicioComponent {
 		}
 	}
 
-	obtenerSeveridadPrioridad(prioridad: PrioridadDenuncia): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
+	obtenerSeveridadPrioridad(prioridad: PrioridadDenuncia | null | undefined): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
 		switch (prioridad) {
 			case 'Alta':
 				return 'danger';
@@ -267,6 +267,14 @@ export class InicioComponent {
 			default:
 				return 'secondary';
 		}
+	}
+
+	obtenerEstadoLabel(estado: EstadoDenuncia | null | undefined): string {
+		return estado ?? 'Sin Atender';
+	}
+
+	obtenerPrioridadLabel(prioridad: PrioridadDenuncia | null | undefined): string {
+		return prioridad ?? 'Sin Prioridad';
 	}
 
 	obtenerClaseInsignia(tono: 'success' | 'danger' | 'info'): string {

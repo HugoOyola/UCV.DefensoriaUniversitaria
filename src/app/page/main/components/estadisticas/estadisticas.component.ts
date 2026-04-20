@@ -72,7 +72,9 @@ export class EstadisticasComponent {
 			if (denuncia.estado === 'En Proceso') inicial.enProceso += 1;
 			if (denuncia.estado === 'Resuelto') inicial.resueltas += 1;
 			inicial.porTipoUsuario[denuncia.tipoUsuario] += 1;
-			inicial.porPrioridad[denuncia.prioridad] += 1;
+			if (denuncia.prioridad) {
+				inicial.porPrioridad[denuncia.prioridad] += 1;
+			}
 		}
 
 		return inicial;
@@ -80,7 +82,9 @@ export class EstadisticasComponent {
 
 	public readonly serieEstado = computed<SerieEstadoItem[]>(() => {
 		const total = this.resumen().total;
+		const sinAtender = this.denuncias().filter((x) => !x.estado || x.estado === 'Sin Atender').length;
 		return [
+			{estado: 'Sin Atender', cantidad: sinAtender, porcentaje: this.getPorcentaje(sinAtender, total), barraClass: 'bg-slate-400'},
 			{estado: 'Pendiente', cantidad: this.resumen().pendientes, porcentaje: this.getPorcentaje(this.resumen().pendientes, total), barraClass: 'bg-red-500'},
 			{estado: 'En Proceso', cantidad: this.resumen().enProceso, porcentaje: this.getPorcentaje(this.resumen().enProceso, total), barraClass: 'bg-blue-500'},
 			{estado: 'Resuelto', cantidad: this.resumen().resueltas, porcentaje: this.getPorcentaje(this.resumen().resueltas, total), barraClass: 'bg-emerald-500'},

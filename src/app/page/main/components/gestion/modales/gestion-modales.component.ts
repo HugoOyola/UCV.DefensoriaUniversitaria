@@ -59,6 +59,7 @@ export class GestionModalesComponent {
   };
 
   public readonly estadoOptions: OpcionSimple[] = [
+    { label: 'Sin Atender', value: 'Sin Atender' },
     { label: 'Pendiente', value: 'Pendiente' },
     { label: 'En Proceso', value: 'En Proceso' },
     { label: 'Resuelto', value: 'Resuelto' },
@@ -84,15 +85,16 @@ export class GestionModalesComponent {
     },
   ]);
 
-  public readonly estadoSeleccionado = signal<EstadoDenuncia>('Pendiente');
-  public readonly prioridadSeleccionada = signal<PrioridadDenuncia>('Media');
-  public readonly clasificacionSeleccionada = signal<string>('Sin Clasificación');
+  public readonly estadoSeleccionado = signal<EstadoDenuncia | null>(null);
+  public readonly prioridadSeleccionada = signal<PrioridadDenuncia | null>(null);
+  public readonly clasificacionSeleccionada = signal<string | null>(null);
 
   public readonly clasificacionModalVisible = signal(false);
   public readonly modoClasificacion = signal<'existente' | 'nuevo'>('existente');
   public readonly grupoExistenteSeleccionado = signal<string | null>(null);
   public readonly nuevoGrupoNombre = signal('');
   public readonly nuevaSubclasificacionNombre = signal('');
+  public readonly intentoGuardarCaso = signal(false);
 
   public readonly gruposClasificacionOptions = computed<OpcionSimple[]>(() =>
     this.clasificacionGroups().map((group) => ({ label: group.label, value: group.label }))
@@ -109,6 +111,21 @@ export class GestionModalesComponent {
     }
 
     return !!this.nuevoGrupoNombre().trim();
+  });
+
+  public readonly puedeGuardarCaso = computed(() => {
+    const prioridad = this.prioridadSeleccionada();
+    const clasificacion = this.clasificacionSeleccionada();
+    return !!prioridad && !!clasificacion && clasificacion !== 'Sin Clasificación';
+  });
+
+  public readonly prioridadInvalida = computed(
+    () => this.intentoGuardarCaso() && !this.prioridadSeleccionada()
+  );
+
+  public readonly clasificacionInvalida = computed(() => {
+    const clasificacion = this.clasificacionSeleccionada();
+    return this.intentoGuardarCaso() && (!clasificacion || clasificacion === 'Sin Clasificación');
   });
 
   public readonly detalleVisible = input<boolean>(false);
@@ -209,7 +226,7 @@ Defensoria Universitaria`,
 
   public readonly detalleModalBadge = computed(() => {
     const currentComplaint = this.complaint();
-    return currentComplaint ? currentComplaint.estado : '';
+    return currentComplaint?.estado ?? 'Sin Atender';
   });
 
   constructor() {
@@ -219,12 +236,15 @@ Defensoria Universitaria`,
         return;
       }
 
-      this.estadoSeleccionado.set(currentComplaint.estado);
-      this.prioridadSeleccionada.set(currentComplaint.prioridad);
+      this.estadoSeleccionado.set(currentComplaint.estado ?? null);
+      this.prioridadSeleccionada.set(currentComplaint.prioridad ?? null);
 
-      const clasificacion = currentComplaint.clasificacion?.trim() || 'Sin Clasificación';
-      this.ensureClasificacionExists(clasificacion);
+      const clasificacion = currentComplaint.clasificacion?.trim() || null;
+      if (clasificacion) {
+        this.ensureClasificacionExists(clasificacion);
+      }
       this.clasificacionSeleccionada.set(clasificacion);
+      this.intentoGuardarCaso.set(false);
     });
 
     effect(() => {
@@ -246,6 +266,7 @@ Defensoria Universitaria`,
   }
 
   closeDetalle(): void {
+    this.intentoGuardarCaso.set(false);
     this.detalleVisibleChange.emit(false);
   }
 
@@ -309,14 +330,30 @@ Defensoria Universitaria`,
       return;
     }
 
+    this.intentoGuardarCaso.set(true);
+    if (!this.puedeGuardarCaso()) {
+      return;
+    }
+
+    const prioridad = this.prioridadSeleccionada();
+    const clasificacion = this.clasificacionSeleccionada();
+    const estadoActual = this.estadoSeleccionado();
+
+    const tieneConfiguracion = !!prioridad && !!clasificacion && clasificacion !== 'Sin Clasificación';
+    const nuevoEstado: EstadoDenuncia =
+      tieneConfiguracion && (!estadoActual || estadoActual === 'Sin Atender')
+        ? 'En Proceso'
+        : (estadoActual ?? 'Sin Atender');
+
     const updatedComplaint: Denuncia = {
       ...currentComplaint,
-      estado: this.estadoSeleccionado(),
-      prioridad: this.prioridadSeleccionada(),
-      clasificacion: this.clasificacionSeleccionada(),
+      estado: nuevoEstado,
+      prioridad,
+      clasificacion,
     };
 
     this.guardarCambios.emit(updatedComplaint);
+    this.intentoGuardarCaso.set(false);
     this.detalleVisibleChange.emit(false);
   }
 

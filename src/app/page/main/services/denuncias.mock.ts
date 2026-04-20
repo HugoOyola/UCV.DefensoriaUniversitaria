@@ -4,8 +4,9 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
   {
     expediente: 'DEF-2026-001',
     fecha: new Date('2026-03-20T09:15:00'),
-    estado: 'Pendiente',
-    prioridad: 'Alta',
+    estado: null,
+    prioridad: null,
+    clasificacion: null,
     asignado: null,
 
     tipoUsuario: '13',
@@ -51,8 +52,9 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
   {
     expediente: 'DEF-2026-002',
     fecha: new Date('2026-03-20T11:40:00'),
-    estado: 'En Proceso',
-    prioridad: 'Media',
+    estado: null,
+    prioridad: null,
+    clasificacion: null,
     asignado: 'Analista DU - Carla Rojas',
 
     tipoUsuario: '12',
@@ -97,8 +99,9 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
   {
     expediente: 'DEF-2026-003',
     fecha: new Date('2026-03-21T08:20:00'),
-    estado: 'Resuelto',
-    prioridad: 'Baja',
+    estado: null,
+    prioridad: null,
+    clasificacion: null,
     asignado: 'Especialista DU - Luis Torres',
 
     tipoUsuario: '21',
@@ -141,8 +144,9 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
   {
     expediente: 'DEF-2026-004',
     fecha: new Date('2026-03-21T10:05:00'),
-    estado: 'Pendiente',
-    prioridad: 'Alta',
+    estado: null,
+    prioridad: null,
+    clasificacion: null,
     asignado: null,
 
     tipoUsuario: '14',
@@ -187,8 +191,9 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
   {
     expediente: 'DEF-2026-005',
     fecha: new Date('2026-03-21T15:30:00'),
-    estado: 'En Proceso',
-    prioridad: 'Alta',
+    estado: null,
+    prioridad: null,
+    clasificacion: null,
     asignado: 'Coordinadora DU - Ana Salinas',
 
     tipoUsuario: '13',
@@ -234,8 +239,9 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
   {
     expediente: 'DEF-2026-006',
     fecha: new Date('2026-03-22T09:00:00'),
-    estado: 'Resuelto',
-    prioridad: 'Media',
+    estado: null,
+    prioridad: null,
+    clasificacion: null,
     asignado: 'Analista DU - Marco Peña',
 
     tipoUsuario: '72',

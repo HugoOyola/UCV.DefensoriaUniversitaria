@@ -76,7 +76,7 @@ export class DerivarModalComponent {
     return c ? `Derivar expediente ${c.expediente}` : 'Derivar caso';
   });
 
-  public readonly modalBadge = computed(() => this.complaint()?.estado ?? '');
+  public readonly modalBadge = computed(() => this.complaint()?.estado ?? 'Sin Atender');
 
   public readonly destinoOptions = computed<OpcionSimple[]>(() =>
     this.tipoDestino() === 'area' ? this.areasDestino : this.programasDestino

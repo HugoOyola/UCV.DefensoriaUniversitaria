@@ -1,5 +1,5 @@
 // ─── Tipos ────────────────────────────────────────────────────────────────────
-export type EstadoDenuncia = 'Pendiente' | 'En Proceso' | 'Resuelto';
+export type EstadoDenuncia = 'Sin Atender' | 'Pendiente' | 'En Proceso' | 'Resuelto';
 export type PrioridadDenuncia = 'Alta' | 'Media' | 'Baja';
 
 /**
@@ -40,8 +40,8 @@ export interface Denuncia {
   fecha: Date;
 
   tipoUsuario: TipoUsuarioDenuncia;
-  estado: EstadoDenuncia;
-  prioridad: PrioridadDenuncia;
+  estado?: EstadoDenuncia | null;
+  prioridad?: PrioridadDenuncia | null;
   asignado?: string | null;
 
   // Información institucional
@@ -78,7 +78,7 @@ export interface Denuncia {
   adjuntos?: Adjunto[];
 
   // Campos opcionales adicionales para dashboard o gestión interna
-  clasificacion?: string;
+  clasificacion?: string | null;
 }
 
 /**

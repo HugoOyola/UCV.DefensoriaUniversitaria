@@ -213,10 +213,32 @@
         <div class="mt-3 space-y-3">
           <div>
             <p class="mb-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Estado actual</p>
-            <p-select class="w-full border border-solid border-slate-300 bg-white" [options]="estadoOptions"
-              optionLabel="label" optionValue="value" [ngModel]="estadoSeleccionado()"
-              (ngModelChange)="estadoSeleccionado.set($event)" placeholder="Seleccione estado">
-            </p-select>
+            <div class="flex min-h-10 items-center rounded-xl border border-solid border-slate-200 bg-white px-3 py-2">
+              @if (!estadoSeleccionado() || estadoSeleccionado() === 'Sin Atender') {
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-solid border-slate-300 bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-500">
+                <i class="pi pi-minus-circle text-xs"></i>
+                Sin Atender
+              </span>
+              } @else if (estadoSeleccionado() === 'Pendiente') {
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-solid border-stone-300 bg-stone-100 px-3 py-1 text-sm font-semibold text-stone-700">
+                <i class="pi pi-clock text-xs"></i>
+                Pendiente
+              </span>
+              } @else if (estadoSeleccionado() === 'En Proceso') {
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-solid border-blue-200 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">
+                <i class="pi pi-spinner pi-spin text-xs"></i>
+                En Proceso
+              </span>
+              } @else if (estadoSeleccionado() === 'Resuelto') {
+              <span class="inline-flex items-center gap-1.5 rounded-full border border-solid border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
+                <i class="pi pi-check-circle text-xs"></i>
+                Resuelto
+              </span>
+              }
+            </div>
+            @if (!estadoSeleccionado() || estadoSeleccionado() === 'Sin Atender') {
+            <p class="mt-1 text-[10px] text-slate-400">Se actualizará a <strong>En Proceso</strong> al guardar con prioridad y clasificación.</p>
+            }
           </div>
 
           <div>
@@ -225,6 +247,9 @@
               optionLabel="label" optionValue="value" [ngModel]="prioridadSeleccionada()"
               (ngModelChange)="prioridadSeleccionada.set($event)" placeholder="Seleccione prioridad">
             </p-select>
+            @if (prioridadInvalida()) {
+            <p class="mt-1 text-[10px] font-semibold text-red-600">Seleccione una prioridad para guardar cambios.</p>
+            }
           </div>
 
           <div>
@@ -236,9 +261,9 @@
                 [ngModel]="clasificacionSeleccionada()" (ngModelChange)="clasificacionSeleccionada.set($event)"
                 placeholder="Seleccione clasificación">
                 <ng-template let-group pTemplate="group">
-                  <div class="flex items-center gap-2 rounded-md bg-slate-50 px-2 py-1">
-                    <i class="pi pi-folder text-xs text-sky-600"></i>
-                    <span class="text-xs font-bold uppercase tracking-[0.08em] text-slate-700">{{ group.label }}</span>
+                  <div class="flex items-center gap-2 rounded-md bg-slate-100 px-2 py-1">
+                    <i class="pi pi-folder text-sm text-blue-700"></i>
+                    <span class="text-sm font-bold uppercase tracking-[0.08em] text-blue-700">{{ group.label }}</span>
                   </div>
                 </ng-template>
               </p-select>
@@ -248,11 +273,20 @@
                 <i class="pi pi-plus"></i>
               </button>
             </div>
+            @if (clasificacionInvalida()) {
+            <p class="mt-1 text-[10px] font-semibold text-red-600">Seleccione una clasificación válida para guardar cambios.</p>
+            }
           </div>
         </div>
 
+        @if (intentoGuardarCaso() && !puedeGuardarCaso()) {
+        <p class="mt-3 rounded-lg border border-solid border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+          Complete prioridad y clasificación antes de guardar.
+        </p>
+        }
+
         <div class="mt-4">
-          <p-button class="block w-full" styleClass="w-full justify-center" label="Guardar cambios" icon="pi pi-check" (onClick)="saveChanges()">
+          <p-button class="block w-full" styleClass="w-full justify-center" label="Guardar cambios" icon="pi pi-check" [disabled]="!puedeGuardarCaso()" (onClick)="saveChanges()">
           </p-button>
         </div>
       </div>

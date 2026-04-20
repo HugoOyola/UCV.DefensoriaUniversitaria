@@ -28,7 +28,7 @@ export class ReportesComponent {
 	public readonly denuncias = signal<Denuncia[]>([]);
 
 	public readonly filtroEstado = signal<EstadoDenuncia | 'Todos'>('Todos');
-	public readonly filtroPrioridad = signal<PrioridadDenuncia | 'Todos'>('Todos');
+	public readonly filtroPrioridad = signal<PrioridadDenuncia | 'Sin Prioridad' | 'Todos'>('Todos');
 	public readonly filtroCampus = signal<string>('Todos');
 	public readonly filtroTexto = signal('');
 
@@ -52,8 +52,14 @@ export class ReportesComponent {
 		const texto = this.filtroTexto().trim().toLowerCase();
 
 		return this.denuncias().filter((item) => {
-			const cumpleEstado = estado === 'Todos' || item.estado === estado;
-			const cumplePrioridad = prioridad === 'Todos' || item.prioridad === prioridad;
+			const cumpleEstado =
+				estado === 'Todos' ||
+				(estado === 'Sin Atender'
+					? !item.estado || item.estado === 'Sin Atender'
+					: item.estado === estado);
+			const cumplePrioridad =
+				prioridad === 'Todos' ||
+				(prioridad === 'Sin Prioridad' ? !item.prioridad : item.prioridad === prioridad);
 			const cumpleCampus = campus === 'Todos' || this.obtenerCampus(item.filial) === campus;
 			const nombreCompleto = `${item.nombre} ${item.apellidos}`.toLowerCase();
 			const cumpleTexto =
@@ -112,8 +118,8 @@ export class ReportesComponent {
 			item.expediente,
 			new Date(item.fecha).toISOString(),
 			this.obtenerCampus(item.filial),
-			item.estado,
-			item.prioridad,
+			this.getEstadoLabel(item.estado),
+			this.getPrioridadLabel(item.prioridad),
 			`${item.nombre} ${item.apellidos}`,
 			item.documento,
 			item.email,
@@ -134,6 +140,14 @@ export class ReportesComponent {
 
 	public obtenerCampusLabel(filial: string | number | null): string {
 		return this.obtenerCampus(filial);
+	}
+
+	public getEstadoLabel(estado: EstadoDenuncia | null | undefined): string {
+		return estado ?? 'Sin Atender';
+	}
+
+	public getPrioridadLabel(prioridad: PrioridadDenuncia | null | undefined): string {
+		return prioridad ?? 'Sin Prioridad';
 	}
 
 	private cargar(): void {

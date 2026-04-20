@@ -41,6 +41,7 @@
 					<select class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm"
 						[ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)">
 						<option value="Todos">Todos los estados</option>
+						<option value="Sin Atender">Sin Atender</option>
 						<option value="Pendiente">Pendiente</option>
 						<option value="En Proceso">En Proceso</option>
 						<option value="Resuelto">Resuelto</option>
@@ -49,6 +50,7 @@
 					<select class="w-full rounded-xl border border-solid border-slate-300 px-3 py-2 text-sm"
 						[ngModel]="filtroPrioridad()" (ngModelChange)="filtroPrioridad.set($event)">
 						<option value="Todos">Todas las prioridades</option>
+						<option value="Sin Prioridad">Sin Prioridad</option>
 						<option value="Alta">Alta</option>
 						<option value="Media">Media</option>
 						<option value="Baja">Baja</option>
@@ -120,8 +122,8 @@
 									<td class="py-2 border-0 border-b border-solid border-slate-100 font-semibold">{{ item.expediente }}</td>
 									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.fecha | date: 'dd/MM/yyyy' }}</td>
 									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ obtenerCampusLabel(item.filial) }}</td>
-									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.estado }}</td>
-									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ item.prioridad }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ getEstadoLabel(item.estado) }}</td>
+									<td class="py-2 border-0 border-b border-solid border-slate-100">{{ getPrioridadLabel(item.prioridad) }}</td>
 								</tr>
 							}
 						</tbody>

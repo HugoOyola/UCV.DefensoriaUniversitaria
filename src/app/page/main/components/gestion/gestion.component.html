@@ -219,14 +219,14 @@
               <td class="whitespace-nowrap px-4 py-4 text-center">
                 <span [class]="getEstadoUi(complaint.estado).badgeClass">
                   <i class="pi" [class]="getEstadoUi(complaint.estado).icon"></i>
-                  {{ complaint.estado }}
+                  {{ getEstadoLabel(complaint.estado) }}
                 </span>
               </td>
 
               <td class="whitespace-nowrap px-4 py-4 text-center">
                 <span [class]="getPrioridadUi(complaint.prioridad).badgeClass">
                   <span [class]="getPrioridadUi(complaint.prioridad).dotClass"></span>
-                  {{ complaint.prioridad }}
+                  {{ getPrioridadLabel(complaint.prioridad) }}
                 </span>
               </td>
 

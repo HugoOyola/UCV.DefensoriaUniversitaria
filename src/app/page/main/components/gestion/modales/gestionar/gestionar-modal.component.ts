@@ -60,12 +60,6 @@ export class GestionarModalComponent {
   public readonly guardarCambios = output<Denuncia>();
 
   // ─── Options ──────────────────────────────────────────────────────────────
-  public readonly estadoOptions: OpcionSimple[] = [
-    { label: 'Pendiente', value: 'Pendiente' },
-    { label: 'En Proceso', value: 'En Proceso' },
-    { label: 'Resuelto', value: 'Resuelto' },
-  ];
-
   public readonly prioridadOptions: OpcionSimple[] = [
     { label: 'Alta', value: 'Alta' },
     { label: 'Media', value: 'Media' },
@@ -87,15 +81,16 @@ export class GestionarModalComponent {
     },
   ]);
 
-  public readonly estadoSeleccionado = signal<EstadoDenuncia>('Pendiente');
-  public readonly prioridadSeleccionada = signal<PrioridadDenuncia>('Media');
-  public readonly clasificacionSeleccionada = signal<string>('Sin Clasificación');
+  public readonly estadoSeleccionado = signal<EstadoDenuncia | null>(null);
+  public readonly prioridadSeleccionada = signal<PrioridadDenuncia | null>(null);
+  public readonly clasificacionSeleccionada = signal<string | null>(null);
 
   public readonly clasificacionModalVisible = signal(false);
   public readonly modoClasificacion = signal<'existente' | 'nuevo'>('existente');
   public readonly grupoExistenteSeleccionado = signal<string | null>(null);
   public readonly nuevoGrupoNombre = signal('');
   public readonly nuevaSubclasificacionNombre = signal('');
+  public readonly intentoGuardarCaso = signal(false);
 
   // ─── Computed ─────────────────────────────────────────────────────────────
   public readonly modalTitle = computed(() => {
@@ -108,7 +103,7 @@ export class GestionarModalComponent {
     return c ? `${c.nombre} ${c.apellidos}` : '';
   });
 
-  public readonly modalBadge = computed(() => this.complaint()?.estado ?? '');
+  public readonly modalBadge = computed(() => this.complaint()?.estado ?? 'Sin Atender');
 
   public readonly gruposClasificacionOptions = computed<OpcionSimple[]>(() =>
     this.clasificacionGroups().map((g) => ({ label: g.label, value: g.label }))
@@ -122,17 +117,35 @@ export class GestionarModalComponent {
       : !!this.nuevoGrupoNombre().trim();
   });
 
+  public readonly puedeGuardarCaso = computed(() => {
+    const prioridad = this.prioridadSeleccionada();
+    const clasificacion = this.clasificacionSeleccionada();
+    return !!prioridad && !!clasificacion && clasificacion !== 'Sin Clasificación';
+  });
+
+  public readonly prioridadInvalida = computed(
+    () => this.intentoGuardarCaso() && !this.prioridadSeleccionada()
+  );
+
+  public readonly clasificacionInvalida = computed(() => {
+    const clasificacion = this.clasificacionSeleccionada();
+    return this.intentoGuardarCaso() && (!clasificacion || clasificacion === 'Sin Clasificación');
+  });
+
   constructor() {
     effect(() => {
       const c = this.complaint();
       if (!c) return;
 
-      this.estadoSeleccionado.set(c.estado);
-      this.prioridadSeleccionada.set(c.prioridad);
+      this.estadoSeleccionado.set(c.estado ?? null);
+      this.prioridadSeleccionada.set(c.prioridad ?? null);
 
-      const clasificacion = c.clasificacion?.trim() || 'Sin Clasificación';
-      this.ensureClasificacionExists(clasificacion);
+      const clasificacion = c.clasificacion?.trim() || null;
+      if (clasificacion) {
+        this.ensureClasificacionExists(clasificacion);
+      }
       this.clasificacionSeleccionada.set(clasificacion);
+      this.intentoGuardarCaso.set(false);
     });
   }
 
@@ -142,6 +155,7 @@ export class GestionarModalComponent {
   }
 
   close(): void {
+    this.intentoGuardarCaso.set(false);
     this.visibleChange.emit(false);
   }
 
@@ -149,13 +163,30 @@ export class GestionarModalComponent {
     const c = this.complaint();
     if (!c) return;
 
+    this.intentoGuardarCaso.set(true);
+    if (!this.puedeGuardarCaso()) {
+      return;
+    }
+
+    const prioridad = this.prioridadSeleccionada();
+    const clasificacion = this.clasificacionSeleccionada();
+    const estadoActual = this.estadoSeleccionado();
+
+    const tieneConfiguracion = !!prioridad && !!clasificacion && clasificacion !== 'Sin Clasificación';
+
+    const nuevoEstado: EstadoDenuncia =
+      tieneConfiguracion && (!estadoActual || estadoActual === 'Sin Atender')
+        ? 'En Proceso'
+        : (estadoActual ?? 'Sin Atender');
+
     this.guardarCambios.emit({
       ...c,
-      estado: this.estadoSeleccionado(),
-      prioridad: this.prioridadSeleccionada(),
-      clasificacion: this.clasificacionSeleccionada(),
+      estado: nuevoEstado,
+      prioridad,
+      clasificacion,
     });
 
+    this.intentoGuardarCaso.set(false);
     this.visibleChange.emit(false);
   }
 

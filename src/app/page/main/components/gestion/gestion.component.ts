@@ -77,6 +77,7 @@ export class GestionComponent {
   public errorCarga = signal<string | null>(null);
 
   public statusOptions = [
+    { label: 'Sin Atender', value: 'Sin Atender' as EstadoDenuncia },
     { label: 'Pendiente', value: 'Pendiente' as EstadoDenuncia },
     { label: 'En Proceso', value: 'En Proceso' as EstadoDenuncia },
     { label: 'Resuelto', value: 'Resuelto' as EstadoDenuncia },
@@ -119,6 +120,11 @@ export class GestionComponent {
   };
 
   private readonly estadoUi: Record<EstadoDenuncia, EstadoUi> = {
+    'Sin Atender': {
+      icon: 'pi-minus-circle',
+      badgeClass:
+        'inline-flex items-center gap-1 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-500',
+    },
     Pendiente: {
       icon: 'pi-clock',
       badgeClass:
@@ -224,12 +230,32 @@ export class GestionComponent {
     return this.tipoUsuarioUi[tipo] ?? this.tipoUsuarioUi['13'];
   }
 
-  getEstadoUi(estado: EstadoDenuncia): EstadoUi {
-    return this.estadoUi[estado] ?? this.estadoUi['Pendiente'];
+  getEstadoUi(estado: EstadoDenuncia | null | undefined): EstadoUi {
+    if (!estado) {
+      return this.estadoUi['Sin Atender'];
+    }
+
+    return this.estadoUi[estado] ?? this.estadoUi['Sin Atender'];
   }
 
-  getPrioridadUi(prioridad: PrioridadDenuncia): PrioridadUi {
+  getPrioridadUi(prioridad: PrioridadDenuncia | null | undefined): PrioridadUi {
+    if (!prioridad) {
+      return {
+        badgeClass:
+          'inline-flex items-center gap-2 rounded-full bg-slate-100 px-2.5 py-1 text-sm font-semibold text-slate-500 ring-1 ring-inset ring-slate-300',
+        dotClass: 'h-2.5 w-2.5 rounded-full bg-slate-400',
+      };
+    }
+
     return this.prioridadUi[prioridad] ?? this.prioridadUi.Baja;
+  }
+
+  getEstadoLabel(estado: EstadoDenuncia | null | undefined): string {
+    return estado ?? 'Sin Atender';
+  }
+
+  getPrioridadLabel(prioridad: PrioridadDenuncia | null | undefined): string {
+    return prioridad ?? 'Sin Prioridad';
   }
 
   getTipoUsuarioLabel(tipo: TipoUsuarioDenuncia): string {

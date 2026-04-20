@@ -143,7 +143,7 @@ Defensoria Universitaria`,
     return c ? `Responder Denuncia / Reclamo` : 'Responder';
   });
 
-  public readonly modalBadge = computed(() => this.complaint()?.estado ?? '');
+  public readonly modalBadge = computed(() => this.complaint()?.estado ?? 'Sin Atender');
 
   public readonly inputAdjuntosId = computed(() => {
     const expediente = this.complaint()?.expediente ?? 'caso';
