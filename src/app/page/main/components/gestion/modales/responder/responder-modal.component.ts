@@ -47,6 +47,21 @@ export class ResponderModalComponent {
     '5': 'Tarapoto',
   };
 
+  private readonly escuelaPorCodigo: Record<string, string> = {
+    '101': 'Ingeniería de Sistemas',
+    '110': 'Derecho',
+    '205': 'Psicología',
+    '210': 'Contabilidad',
+    '315': 'Administración',
+    '407': 'Enfermería',
+  };
+
+  private readonly modalidadPorCodigo: Record<string, string> = {
+    '5001': 'Presencial',
+    '5002': 'Semipresencial',
+    '5003': 'Virtual',
+  };
+
   // ─── Inputs / Outputs ─────────────────────────────────────────────────────
   public readonly visible = input<boolean>(false);
   public readonly complaint = input<Denuncia | null>(null);
@@ -206,6 +221,16 @@ Defensoria Universitaria`,
   getCampusLabel(filial: string | number | null | undefined): string {
     if (filial == null || filial === '') return 'No especificado';
     return this.campusPorFilial[String(filial)] ?? String(filial);
+  }
+
+  getEscuelaLabel(escuela: string | number | null | undefined): string {
+    if (escuela == null || escuela === '') return 'No especificado';
+    return this.escuelaPorCodigo[String(escuela)] ?? String(escuela);
+  }
+
+  getModalidadLabel(modalidad: string | number | null | undefined): string {
+    if (modalidad == null || modalidad === '') return 'No especificado';
+    return this.modalidadPorCodigo[String(modalidad)] ?? String(modalidad);
   }
 
   getApoderadoNombre(c: Denuncia): string {
