@@ -270,6 +270,23 @@ export class GestionComponent {
     return map[tipo] ?? tipo;
   }
 
+  getCompactEmail(email: string | null | undefined): string {
+    const value = email?.trim() ?? '';
+    if (!value) {
+      return 'Sin correo';
+    }
+
+    const [localPart, domainPart] = value.split('@');
+    if (!localPart || !domainPart) {
+      return value;
+    }
+
+    const visibleDomain = domainPart.slice(0, 3);
+    const ellipsis = domainPart.length > 3 ? '...' : '';
+
+    return `${localPart}@${visibleDomain}${ellipsis}`;
+  }
+
   getAsignadoNombre(asignado: string | null | undefined): string {
     const value = asignado?.trim() ?? '';
     if (!value) {

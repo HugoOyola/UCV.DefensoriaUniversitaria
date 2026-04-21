@@ -153,7 +153,7 @@ export const DENUNCIAS_MOCK: Denuncia[] = [
     filial: 1,
     nombre: 'José Miguel',
     apellidos: 'Herrera Ruiz',
-    documento: 'XPT458963',
+    documento: '45896335',
     escuelaProfesional: 110,
     modalidad: 5003,
     domicilio: 'Av. Brasil 1450, Breña',
