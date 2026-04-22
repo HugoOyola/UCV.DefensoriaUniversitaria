@@ -215,3 +215,65 @@ export interface OpcionSimple {
   label: string;
   value: string;
 }
+
+// ─── API: Defensoria Universitaria ───────────────────────────────────────────
+
+export interface ListarExpedientesDUParam {
+	idPerfil: number;
+	busqueda: string;
+	fechaInicio: string;
+	fechaFin: string;
+	estadoExp: number;
+	prioridades: number;
+}
+
+export interface ArchivoExpedienteDU {
+	idExpediente: number;
+	nombreArchivo: string;
+	extension: string;
+	mimeType: string;
+	rutaArchivo: string;
+	contenido: string | null;
+	tamanoBytes: number;
+	cGoogleDriveId: string;
+	cPerCodigo: string;
+	esActivo: number;
+	descripcion: string;
+}
+
+export interface ExpedienteDU {
+	idExpediente: number;
+	numeroExpediente: number;
+	codigoExpediente: string;
+	formatoExpediente: string;
+	tipoUsuario: number;
+	cPerJuridica: string;
+	nombreUsuario: string;
+	apellidoUsuario: string;
+	documento: string;
+	nUniOrgCodigo: number;
+	modalidad: number;
+	direccion: string;
+	telefono: string;
+	correo: string;
+	fechaRegistro: string;
+	tieneApoderado: string;
+	apoApellidos: string | null;
+	apoNombres: string | null;
+	apoCorreo: string | null;
+	idDepartamento: number;
+	opciones: string;
+	textoOtros: string | null;
+	descripcion: string;
+	solicita: string;
+	expEstado: number;
+	cPerCodigo: string;
+	expedienteId: number;
+	cUniOrgNombre: string;
+	cFilial: string;
+	nombrePerfil: string;
+	tipoModalidad: string;
+	fechaR: string;
+	opcionesTexto: string;
+	archivos: ArchivoExpedienteDU[];
+}

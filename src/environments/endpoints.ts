@@ -6,6 +6,13 @@ export const routes = {
 			Principal_ObtenerDatosPersonales: 'Principal/ObtenerDatosPersonales',
 		},
 	},
+	DefensoriaUniversitariaApi: {
+		url: 'https://ucvapi.azure-api.net/defensoriaUniversitaria/v2/api/',
+		endpoints: {
+			//% Expedientes
+			Expedientes_ListarExpedientesDU: 'Expedientes/ListarExpedientesDU',
+		},
+	},
 	IncidenciaApi:{
 		url: 'http://localhost:5019/api/',
 		endpoints:{

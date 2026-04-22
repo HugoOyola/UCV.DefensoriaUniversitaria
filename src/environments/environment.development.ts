@@ -26,6 +26,9 @@ apiRefreshToken: 'https://jwttrilce.azurewebsites.net/api/RefreshToken',
 				TrilcePrincipalApi: {
 					...routes.TrilcePrincipalApi,
 				},
+				DefensoriaUniversitariaApi: {
+					...routes.DefensoriaUniversitariaApi,
+				},
 			},
 		},
 	},
@@ -37,7 +40,7 @@ apiRefreshToken: 'https://jwttrilce.azurewebsites.net/api/RefreshToken',
 				pass: '7RluNM9ox3T1UR7xOv0EONCo4Nka',
 				tokenUrl: 'https://trilceapi2.ucv.edu.pe:8243/token?grant_type=client_credentials',
 			},
-			routes: {				
+			routes: {
 				IncidenciaApi:{
 					...routes.IncidenciaApi
 				},

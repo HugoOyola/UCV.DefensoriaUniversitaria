@@ -3,21 +3,29 @@ import {Injectable} from '@angular/core';
 import {environment} from '@environment/environment';
 import {ResponseResultLst} from '@interface/responseResult.interface';
 import {GlobalService} from '@shared/services/global.service';
-import {Observable, delay, map, of} from 'rxjs';
+import {Observable, map} from 'rxjs';
 import {ObtenerDatosPersonales} from '../interface/principal';
-import {Denuncia} from '../interface/denuncias.interface';
-import {DENUNCIAS_MOCK} from './denuncias.mock';
+import {
+	Adjunto,
+	Denuncia,
+	EstadoDenuncia,
+	ExpedienteDU,
+	ListarExpedientesDUParam,
+	OtraAreaDenuncia,
+	TipoUsuarioDenuncia,
+} from '../interface/denuncias.interface';
+
 @Injectable({
 	providedIn: 'root',
 })
 export class MainService extends GlobalService {
 	private TrilcePrincipal = environment.ls_apis.trilceapi2.routes.TrilcePrincipalApi;
-	private Incidencia = environment.ls_apis1.trilceapi2.routes.IncidenciaApi;
+	private DefensoriaUniversitaria = environment.ls_apis.trilceapi2.routes.DefensoriaUniversitariaApi;
 
 	constructor() {
 		super();
 	}
-	// params: {showSpinner: false},
+
 	post_Principal_ObtenerDatosPersonales(cPerCodigo: string): Observable<HttpResponse<ResponseResultLst<ObtenerDatosPersonales>>> {
 		const param = {cPerCodigo};
 		const ling = this.TrilcePrincipal.url + this.TrilcePrincipal.endpoints.Principal_ObtenerDatosPersonales;
@@ -27,48 +35,105 @@ export class MainService extends GlobalService {
 		});
 	}
 
-	post_Main_ObtenerDenuncias(): Observable<HttpResponse<ResponseResultLst<Denuncia>>> {
-		const body: ResponseResultLst<Denuncia> = {
-			lstItem: DENUNCIAS_MOCK,
-			pagination: {
-				pageIndex: 1,
-				pageSize: DENUNCIAS_MOCK.length,
-				totalRows: DENUNCIAS_MOCK.length,
-			},
-			isSuccess: true,
-			lstError: [],
-			ticket: 'mock-denuncias',
-			clientName: 'local',
-			userName: 'local',
-			serverName: 'local',
-			resultado: 1,
-		};
-
-		return of(new HttpResponse({ status: 200, body })).pipe(delay(500));
+	post_Expedientes_ListarExpedientesDU(param: ListarExpedientesDUParam): Observable<HttpResponse<ResponseResultLst<ExpedienteDU>>> {
+		const ling = this.DefensoriaUniversitaria.url + this.DefensoriaUniversitaria.endpoints.Expedientes_ListarExpedientesDU;
+		return this._http.post<ResponseResultLst<ExpedienteDU>>(ling, param, {
+			headers: this.headers_a_json,
+			observe: 'response',
+		});
 	}
 
-	// ─── Métodos para denuncias ──────────────────────────────────────────────────
-	/**
-	 * Obtiene la lista de denuncias
-	 * Por ahora usa datos mock, pero mantiene la estructura Observable para
-	 * facilitar la migración futura a una API
-	 */
-	getDenuncias(): Observable<Denuncia[]> {
-		return this.post_Main_ObtenerDenuncias().pipe(
+	post_Main_ObtenerDenuncias(
+		idPerfil: number = 12,
+		estadoExp: number = 0,
+		prioridades: number = 0
+	): Observable<HttpResponse<ResponseResultLst<Denuncia>>> {
+		const ahora = new Date().toISOString();
+		const param: ListarExpedientesDUParam = {
+			idPerfil,
+			busqueda: '',
+			fechaInicio: ahora,
+			fechaFin: ahora,
+			estadoExp,
+			prioridades,
+		};
+		return this.post_Expedientes_ListarExpedientesDU(param).pipe(
+			map((response) => {
+				const body = response.body;
+				const mapped: ResponseResultLst<Denuncia> | null = body
+					? {
+							...body,
+							lstItem: body.lstItem.map((exp) => this.mapExpedienteToDenuncia(exp)),
+					  }
+					: null;
+				return response.clone({body: mapped});
+			})
+		);
+	}
+
+	getDenuncias(idPerfil: number = 12): Observable<Denuncia[]> {
+		return this.post_Main_ObtenerDenuncias(idPerfil).pipe(
 			map((response) => response.body?.lstItem ?? [])
 		);
 	}
 
-	/**
-	 * Obtiene una denuncia por su expediente
-	 * @param expediente Código de expediente (ej: DEF-2025-001)
-	 */
-	getDenunciaByExpediente(expediente: string): Observable<Denuncia | undefined> {
-		// TODO: Cuando esté lista la API, reemplazar esto con:
-		// const url = this.TrilcePrincipal.url + this.TrilcePrincipal.endpoints.Denuncias_ObtenerPorExpediente;
-		// return this._http.post<Denuncia>(url, { expediente }, { headers: this.headers_a_json });
+	// ─── Mapper ───────────────────────────────────────────────────────────────────
 
-		const denuncia = DENUNCIAS_MOCK.find(d => d.expediente === expediente);
-		return of(denuncia);
+	private mapExpedienteToDenuncia(exp: ExpedienteDU): Denuncia {
+		return {
+			expediente: exp.formatoExpediente,
+			fecha: new Date(exp.fechaRegistro),
+			tipoUsuario: String(exp.tipoUsuario) as TipoUsuarioDenuncia,
+			estado: this.mapEstado(exp.expEstado),
+			prioridad: null,
+			asignado: null,
+			filial: exp.cFilial,
+			nombre: exp.nombreUsuario,
+			apellidos: exp.apellidoUsuario,
+			documento: exp.documento,
+			escuelaProfesional: exp.cUniOrgNombre,
+			modalidad: exp.tipoModalidad,
+			domicilio: exp.direccion,
+			telefono: exp.telefono,
+			email: exp.correo,
+			isApoderado: exp.tieneApoderado?.toLowerCase() === 'true',
+			apoderadoApellidos: exp.apoApellidos ?? undefined,
+			apoderadoNombres: exp.apoNombres ?? undefined,
+			apoderadoEmail: exp.apoCorreo ?? undefined,
+			otraArea: this.mapOtraArea(exp.opcionesTexto),
+			otraAreaOtro: exp.textoOtros ?? undefined,
+			expone: exp.descripcion,
+			solicita: exp.solicita,
+			adjuntos: exp.archivos?.map((archivo) => ({
+				nombre: archivo.nombreArchivo,
+				url: archivo.cGoogleDriveId,
+				tipo: archivo.mimeType,
+				tamanio: archivo.tamanoBytes,
+			} as Adjunto)),
+		};
+	}
+
+	private mapEstado(expEstado: number): EstadoDenuncia | null {
+		switch (expEstado) {
+			case 1: return 'Sin Atender';
+			case 2: return 'Pendiente';
+			case 3: return 'En Proceso';
+			case 4: return 'Resuelto';
+			default: return null;
+		}
+	}
+
+	private mapOtraArea(opcionesTexto: string | null | undefined): OtraAreaDenuncia {
+		const texto = (opcionesTexto ?? '').toLowerCase();
+		return {
+			libro: texto.includes('libro'),
+			tribunal: texto.includes('tribunal'),
+			comision: texto.includes('comision'),
+			direccion: texto.includes('direccion'),
+			secretaria: texto.includes('secretaria'),
+			cap: texto.includes('cap'),
+			otro: texto.includes('otro'),
+		};
 	}
 }
+
