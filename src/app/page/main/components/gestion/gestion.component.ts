@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { PrimeNG } from 'primeng/config';
 import { GestionarModalComponent } from '@app/page/main/components/gestion/modales/gestionar/gestionar-modal.component';
 import { ResponderModalComponent } from '@app/page/main/components/gestion/modales/responder/responder-modal.component';
 import { DerivarModalComponent } from '@app/page/main/components/gestion/modales/derivar/derivar-modal.component';
@@ -62,6 +63,45 @@ type PrioridadUi = {
 })
 export class GestionComponent {
   private readonly mainService = inject(MainService);
+  private readonly primeNgConfig = inject(PrimeNG);
+
+  public readonly datePickerLocale = {
+    firstDayOfWeek: 1,
+    dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+    dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+    dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+    monthNames: [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre',
+    ],
+    monthNamesShort: [
+      'ene',
+      'feb',
+      'mar',
+      'abr',
+      'may',
+      'jun',
+      'jul',
+      'ago',
+      'sep',
+      'oct',
+      'nov',
+      'dic',
+    ],
+    today: 'Hoy',
+    clear: 'Limpiar',
+    weekHeader: 'Sem',
+  };
 
   public complaintSeleccionado = signal<Denuncia | null>(null);
   public mostrarModalDetalle = signal(false);
@@ -161,6 +201,7 @@ export class GestionComponent {
   };
 
   constructor() {
+    this.primeNgConfig.setTranslation(this.datePickerLocale);
     this.cargarDenuncias();
   }
 
@@ -224,6 +265,20 @@ export class GestionComponent {
         matchesDateRange
       );
     });
+  });
+
+  public hasSelectedDateRange = computed(() => {
+    const dateRange = this.selectedDateRange();
+    if (!dateRange || dateRange.length < 2) {
+      return false;
+    }
+
+    const [startDate, endDate] = dateRange;
+    if (!startDate || !endDate) {
+      return false;
+    }
+
+    return !Number.isNaN(startDate.getTime()) && !Number.isNaN(endDate.getTime());
   });
 
   getTipoUsuarioUi(tipo: TipoUsuarioDenuncia): TipoUsuarioUi {
