@@ -106,11 +106,17 @@ export class MainService extends GlobalService {
 			solicita: exp.solicita,
 			adjuntos: exp.archivos?.map((archivo) => ({
 				nombre: archivo.nombreArchivo,
-				url: archivo.cGoogleDriveId,
+				url: this.buildAdjuntoUrl(archivo.cGoogleDriveId),
 				tipo: archivo.mimeType,
 				tamanio: archivo.tamanoBytes,
 			} as Adjunto)),
 		};
+	}
+
+	private buildAdjuntoUrl(fileId: string | null | undefined): string | undefined {
+		const id = (fileId ?? '').trim();
+		if (!id) return undefined;
+		return `https://ucvapi.azure-api.net/gdrive/Drive/ShowFile/${id}/2`;
 	}
 
 	private mapEstado(expEstado: number): EstadoDenuncia | null {
