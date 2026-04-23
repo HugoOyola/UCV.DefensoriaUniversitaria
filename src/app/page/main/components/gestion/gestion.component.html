@@ -1,53 +1,5 @@
 <section class="bg-slate-100 px-6 py-4">
-  <div class="mb-0" [class.hidden]="!cargando()">
-    <div class="overflow-hidden rounded-3xl border border-solid border-slate-200 bg-white shadow-sm">
-      <div
-        class="flex items-center gap-4 border-b border-0 border-solid border-slate-800 bg-slate-800 px-5 py-5 md:px-6 md:py-6">
-        <div class="rounded-2xl border border-solid border-slate-500 bg-slate-600 p-2">
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '28px', height: '28px' }"></app-skeleton>
-        </div>
-
-        <div class="space-y-2">
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '280px', height: '24px' }"></app-skeleton>
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '420px', height: '16px' }"></app-skeleton>
-        </div>
-      </div>
-
-      <div class="space-y-5 p-5 md:p-6">
-        <div class="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.6fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)_minmax(260px,1fr)]">
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
-          <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '42px' }"></app-skeleton>
-        </div>
-
-        <div class="rounded-2xl border border-solid border-cyan-100 bg-cyan-50 px-4 py-3 text-sm text-cyan-800">
-          <i class="pi pi-spin pi-spinner mr-2"></i>
-          Cargando denuncias. Estamos preparando el listado según tus filtros.
-        </div>
-
-        <div class="overflow-hidden rounded-2xl border border-solid border-slate-200 bg-white p-4 md:p-5">
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
-              @for (item of [1, 2, 3, 4, 5, 6]; track item) {
-              <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '18px' }"></app-skeleton>
-              }
-            </div>
-
-            @for (row of [1, 2, 3, 4]; track row) {
-            <div class="grid grid-cols-2 items-center gap-3 rounded-xl border border-solid border-slate-100 px-2 py-3 md:grid-cols-4 xl:grid-cols-6">
-              @for (cell of [1, 2, 3, 4, 5, 6]; track cell) {
-              <app-skeleton [count]="1" appearance="rounded" [theme]="{ width: '100%', height: '16px' }"></app-skeleton>
-              }
-            </div>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <p-card class="overflow-hidden rounded-3xl border border-solid border-slate-200 bg-white shadow-sm" [class.hidden]="cargando()">
+  <p-card class="overflow-hidden rounded-3xl border border-solid border-slate-200 bg-white shadow-sm">
     <ng-template pTemplate="header">
       <header class="relative border-b border-0 border-solid border-slate-800 bg-slate-800 px-5 py-5 md:px-6 md:py-6">
         <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-slate-600/40 blur-xl"></div>
@@ -55,12 +7,15 @@
 
         <div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div class="flex items-start gap-4">
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-solid border-slate-500 bg-slate-600">
+            <div
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-solid border-slate-500 bg-slate-600">
               <i class="pi pi-users text-lg text-slate-100"></i>
             </div>
 
             <div>
-              <span class="mb-2 inline-flex rounded-full border border-solid border-cyan-300/45 bg-cyan-300/20 px-3 py-1 text-xs font-bold tracking-[0.16em] text-cyan-100">SEGUIMIENTO OPERATIVO</span>
+              <span
+                class="mb-2 inline-flex rounded-full border border-solid border-cyan-300/45 bg-cyan-300/20 px-3 py-1 text-xs font-bold tracking-[0.16em] text-cyan-100">SEGUIMIENTO
+                OPERATIVO</span>
               <h3 class="text-xl font-extrabold tracking-tight text-slate-100 md:text-2xl">
                 Monitoreo de Denuncias / Reclamos
               </h3>
@@ -74,36 +29,98 @@
     </ng-template>
 
     <ng-template pTemplate="content">
-      <!-- Filtros -->
-      <div class="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.6fr)_minmax(220px,0.8fr)_minmax(220px,0.8fr)_minmax(260px,1fr)]">
-        <div class="relative min-w-0">
-          <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          <input pInputText
-            class="w-full pr-4 pl-10 py-2 rounded-lg border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-            placeholder="Buscar por expediente, nombre o correo…" [ngModel]="searchTerm()"
-            (ngModelChange)="searchTerm.set($event)" />
-        </div>
-
-        <div class="min-w-0">
-          <p-datepicker class="w-full" selectionMode="range" dateFormat="dd/mm/yy" [showIcon]="true" [showButtonBar]="true"
-            [readonlyInput]="true" placeholder="Rango de fechas" [ngModel]="selectedDateRange()"
-            (ngModelChange)="selectedDateRange.set($event)" panelStyleClass="gestion-datepicker-panel"
-            appendTo="body">
+      <div class="mb-5 rounded-2xl border border-solid border-slate-200 bg-slate-50/80 p-4 md:p-5">
+        <!-- Filtro principal -->
+        <div class="min-w-0 w-full max-w-md">
+          <span class="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <i class="pi pi-calendar text-slate-500"></i>
+            Selecciona un rango de fechas
+          </span>
+          <p class="mb-3 text-xs text-slate-500">Define el periodo para habilitar filtros y resultados.</p>
+          <p-datepicker class="w-[70%]" selectionMode="range" dateFormat="dd/mm/yy" [showIcon]="true"
+            [showButtonBar]="true" [readonlyInput]="true" placeholder="Rango de fechas" [ngModel]="selectedDateRange()"
+            (ngModelChange)="onDateRangeChange($event)" panelStyleClass="gestion-datepicker-panel" appendTo="body">
           </p-datepicker>
         </div>
 
-        <div class="min-w-0">
-          <p-select class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60" [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
-            placeholder="Todos los estados" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
-          </p-select>
-        </div>
+        @if (hasSelectedDateRange()) {
+        <!-- Filtros secundarios -->
+        <div class="mt-5 border-t border-0 border-solid border-slate-200 pt-4">
+          <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
+            <div class="min-w-0">
+              <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Buscar</span>
+              <div class="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_52px] md:items-center">
+                <div class="relative min-w-0">
+                  <input pInputText
+                    class="w-full rounded-lg border border-solid border-gray-300 px-4 py-2 pr-10 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    placeholder="Buscar por expediente, nombre, DNI o correo..." [ngModel]="searchInputTerm()"
+                    (ngModelChange)="searchInputTerm.set($event)" (keyup.enter)="onBuscar()" />
 
-        <div class="min-w-0">
-          <p-select class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60" [options]="priorityOptions" optionLabel="label" optionValue="value"
-            [showClear]="true" placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
-            (ngModelChange)="selectedPriority.set($event)">
-          </p-select>
+                  @if (searchInputTerm().trim().length > 0) {
+                  <button type="button" aria-label="Limpiar búsqueda"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                    (click)="searchInputTerm.set(''); onBuscar()">
+                    <i class="pi pi-times"></i>
+                  </button>
+                  }
+                </div>
+
+                <div class="min-w-0 md:max-w-[52px]">
+                  <p-button icon="pi pi-search" ariaLabel="Buscar" severity="contrast" class="w-full"
+                    styleClass="w-full" (onClick)="onBuscar()">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="min-w-0">
+              <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Filtros</span>
+              <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div class="min-w-0">
+                  <p-select
+                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    [options]="tipoOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                    placeholder="Todos los tipos" [ngModel]="selectedTipoUsuario()"
+                    (ngModelChange)="selectedTipoUsuario.set($event)">
+                  </p-select>
+                </div>
+
+                <div class="min-w-0">
+                  <p-select
+                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                    placeholder="Todos los estados" [ngModel]="selectedStatus()"
+                    (ngModelChange)="selectedStatus.set($event)">
+                  </p-select>
+                </div>
+
+                <div class="min-w-0">
+                  <p-select
+                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    [options]="priorityOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                    placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
+                    (ngModelChange)="selectedPriority.set($event)">
+                  </p-select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Detalle</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-sm">
+            <span
+              class="inline-flex items-center rounded-full border border-solid border-blue-300 bg-white px-3 py-1 font-medium text-blue-600">
+              Resultados: {{ filteredComplaints().length }}
+            </span>
+            <span
+              class="inline-flex items-center rounded-full border border-solid border-red-300 bg-white px-3 py-1 font-medium text-red-600">
+              Registros cargados: {{ complaints().length }}
+            </span>
+          </div>
         </div>
+        }
       </div>
 
       @if (!hasSelectedDateRange()) {
@@ -123,7 +140,7 @@
       @if (hasSelectedDateRange()) {
       <div class="overflow-hidden rounded-2xl border border-solid border-slate-200 bg-white">
         <p-table [value]="filteredComplaints()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-          [loading]="cargando()" [totalRecords]="filteredComplaints().length" [showCurrentPageReport]="true"
+          [totalRecords]="filteredComplaints().length" [showCurrentPageReport]="true"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
           class="p-datatable-sm p-datatable-striped">
 
@@ -355,24 +372,15 @@
     </ng-template>
   </p-card>
 
-  <app-gestionar-modal
-    [visible]="mostrarModalDetalle()"
-    [complaint]="complaintSeleccionado()"
-    (visibleChange)="onDetalleVisibleChange($event)"
-    (guardarCambios)="onGuardarCambios($event)">
+  <app-gestionar-modal [visible]="mostrarModalDetalle()" [complaint]="complaintSeleccionado()"
+    (visibleChange)="onDetalleVisibleChange($event)" (guardarCambios)="onGuardarCambios($event)">
   </app-gestionar-modal>
 
-  <app-responder-modal
-    [visible]="mostrarModalResponder()"
-    [complaint]="complaintSeleccionado()"
-    (visibleChange)="onResponderVisibleChange($event)"
-    (enviarRespuesta)="manejarEnvioRespuesta($event)">
+  <app-responder-modal [visible]="mostrarModalResponder()" [complaint]="complaintSeleccionado()"
+    (visibleChange)="onResponderVisibleChange($event)" (enviarRespuesta)="manejarEnvioRespuesta($event)">
   </app-responder-modal>
 
-  <app-derivar-modal
-    [visible]="mostrarModalDerivar()"
-    [complaint]="complaintSeleccionado()"
-    (visibleChange)="onDerivarVisibleChange($event)"
-    (confirmarDerivacion)="manejarDerivacion($event)">
+  <app-derivar-modal [visible]="mostrarModalDerivar()" [complaint]="complaintSeleccionado()"
+    (visibleChange)="onDerivarVisibleChange($event)" (confirmarDerivacion)="manejarDerivacion($event)">
   </app-derivar-modal>
 </section>

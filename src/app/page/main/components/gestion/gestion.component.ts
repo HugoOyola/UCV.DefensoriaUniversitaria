@@ -12,7 +12,6 @@ import { PrimeNG } from 'primeng/config';
 import { GestionarModalComponent } from '@app/page/main/components/gestion/modales/gestionar/gestionar-modal.component';
 import { ResponderModalComponent } from '@app/page/main/components/gestion/modales/responder/responder-modal.component';
 import { DerivarModalComponent } from '@app/page/main/components/gestion/modales/derivar/derivar-modal.component';
-import { SkeletonComponent } from '@shared/components/skeleon/skeleton.component';
 import { MainService } from '../../services/main.service';
 import {
   Denuncia,
@@ -51,7 +50,6 @@ type PrioridadUi = {
     SelectModule,
     TableModule,
     TooltipModule,
-    SkeletonComponent,
     GestionarModalComponent,
     ResponderModalComponent,
     DerivarModalComponent,
@@ -109,12 +107,22 @@ export class GestionComponent {
   public mostrarModalDerivar = signal(false);
   public mostrarModalHistorial = signal(false);
 
+  public searchInputTerm = signal('');
   public searchTerm = signal('');
+  public selectedTipoUsuario = signal<TipoUsuarioDenuncia | null>(null);
   public selectedStatus = signal<EstadoDenuncia | null>(null);
   public selectedPriority = signal<PrioridadDenuncia | null>(null);
   public selectedDateRange = signal<Date[] | null>(null);
-  public cargando = signal(true);
+  public cargando = signal(false);
   public errorCarga = signal<string | null>(null);
+
+  public tipoOptions = [
+    { label: 'Estudiante', value: '13' as TipoUsuarioDenuncia },
+    { label: 'Docente', value: '12' as TipoUsuarioDenuncia },
+    { label: 'Administrativo', value: '21' as TipoUsuarioDenuncia },
+    { label: 'Egresado', value: '14' as TipoUsuarioDenuncia },
+    { label: 'Graduado', value: '72' as TipoUsuarioDenuncia },
+  ];
 
   public statusOptions = [
     { label: 'Sin Atender', value: 'Sin Atender' as EstadoDenuncia },
@@ -206,7 +214,6 @@ export class GestionComponent {
   }
 
   private cargarDenuncias(): void {
-    this.cargando.set(true);
     this.errorCarga.set(null);
 
     this.mainService.post_Main_ObtenerDenuncias().subscribe({
@@ -225,8 +232,25 @@ export class GestionComponent {
     });
   }
 
+  onDateRangeChange(value: Date[] | null): void {
+    this.selectedDateRange.set(value);
+
+    if (!this.hasSelectedDateRange()) {
+      this.searchInputTerm.set('');
+      this.searchTerm.set('');
+      this.selectedTipoUsuario.set(null);
+      this.selectedStatus.set(null);
+      this.selectedPriority.set(null);
+    }
+  }
+
+  onBuscar(): void {
+    this.searchTerm.set(this.searchInputTerm().trim());
+  }
+
   public filteredComplaints = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
+    const tipoUsuario = this.selectedTipoUsuario();
     const status = this.selectedStatus();
     const priority = this.selectedPriority();
     const dateRange = this.selectedDateRange();
@@ -259,6 +283,7 @@ export class GestionComponent {
         (complaintDate >= normalizedStart && (!normalizedEnd || complaintDate <= normalizedEnd));
 
       return (
+        (!tipoUsuario || c.tipoUsuario === tipoUsuario) &&
         (!status || c.estado === status) &&
         (!priority || c.prioridad === priority) &&
         matchesTerm &&
