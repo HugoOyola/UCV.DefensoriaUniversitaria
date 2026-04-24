@@ -109,11 +109,12 @@ export class GestionComponent {
 
   public searchInputTerm = signal('');
   public searchTerm = signal('');
+  public searchMode = signal<'none' | 'date' | 'text'>('none');
+  public hasExecutedSearch = signal(false);
   public selectedTipoUsuario = signal<TipoUsuarioDenuncia | null>(null);
   public selectedStatus = signal<EstadoDenuncia | null>(null);
   public selectedPriority = signal<PrioridadDenuncia | null>(null);
   public selectedDateRange = signal<Date[] | null>(null);
-  public cargando = signal(false);
   public errorCarga = signal<string | null>(null);
 
   public tipoOptions = [
@@ -210,13 +211,26 @@ export class GestionComponent {
 
   constructor() {
     this.primeNgConfig.setTranslation(this.datePickerLocale);
-    this.cargarDenuncias();
   }
 
-  private cargarDenuncias(): void {
+  private cargarDenuncias(dateRange: Date[] | null = null): void {
+    const [startDate, endDate] = dateRange ?? [];
+    const hasCompleteRange =
+      !!startDate &&
+      !!endDate &&
+      !Number.isNaN(startDate.getTime()) &&
+      !Number.isNaN(endDate.getTime());
+
+    if (!hasCompleteRange) {
+      return;
+    }
+
     this.errorCarga.set(null);
 
-    this.mainService.post_Main_ObtenerDenuncias().subscribe({
+    const fechaInicio = hasCompleteRange ? startDate : null;
+    const fechaFin = hasCompleteRange ? endDate : null;
+
+    this.mainService.post_Main_ObtenerDenuncias(12, 0, 0, fechaInicio, fechaFin).subscribe({
       next: (response) => {
         this.complaints.set(response.body?.lstItem ?? []);
       },
@@ -224,10 +238,6 @@ export class GestionComponent {
         console.error('Error al cargar las denuncias:', error);
         this.complaints.set([]);
         this.errorCarga.set('No se pudo cargar el listado de denuncias.');
-        this.cargando.set(false);
-      },
-      complete: () => {
-        this.cargando.set(false);
       },
     });
   }
@@ -235,20 +245,48 @@ export class GestionComponent {
   onDateRangeChange(value: Date[] | null): void {
     this.selectedDateRange.set(value);
 
-    if (!this.hasSelectedDateRange()) {
-      this.searchInputTerm.set('');
-      this.searchTerm.set('');
-      this.selectedTipoUsuario.set(null);
-      this.selectedStatus.set(null);
-      this.selectedPriority.set(null);
+    if (this.hasSelectedDateRange()) {
+      this.cargarDenuncias(value);
+      this.searchMode.set('date');
+      this.hasExecutedSearch.set(true);
+      return;
+    }
+
+    if (this.searchMode() === 'date') {
+      this.searchMode.set('none');
+      this.hasExecutedSearch.set(false);
     }
   }
 
   onBuscar(): void {
-    this.searchTerm.set(this.searchInputTerm().trim());
+    const term = this.searchInputTerm().trim();
+
+    this.searchTerm.set(term);
+    if (!term) {
+      if (this.searchMode() === 'text') {
+        this.searchMode.set('none');
+        this.hasExecutedSearch.set(false);
+      }
+      return;
+    }
+
+    this.searchMode.set('text');
+    this.hasExecutedSearch.set(true);
+  }
+
+  nuevaBusqueda(): void {
+    this.selectedDateRange.set(null);
+    this.searchInputTerm.set('');
+    this.searchTerm.set('');
+    this.searchMode.set('none');
+    this.hasExecutedSearch.set(false);
+    this.selectedTipoUsuario.set(null);
+    this.selectedStatus.set(null);
+    this.selectedPriority.set(null);
   }
 
   public filteredComplaints = computed(() => {
+    const mode = this.searchMode();
     const term = this.searchTerm().trim().toLowerCase();
     const tipoUsuario = this.selectedTipoUsuario();
     const status = this.selectedStatus();
@@ -271,6 +309,7 @@ export class GestionComponent {
       const complaintDate = new Date(c.fecha);
 
       const matchesTerm =
+        mode !== 'text' ||
         !term ||
         c.expediente.toLowerCase().includes(term) ||
         nombreCompleto.includes(term) ||
@@ -279,6 +318,7 @@ export class GestionComponent {
         tipoUsuarioLabel.includes(term);
 
       const matchesDateRange =
+        mode !== 'date' ||
         !normalizedStart ||
         (complaintDate >= normalizedStart && (!normalizedEnd || complaintDate <= normalizedEnd));
 
@@ -478,9 +518,5 @@ export class GestionComponent {
 
   cerrarModalHistorial(): void {
     this.mostrarModalHistorial.set(false);
-  }
-
-  exportData(): void {
-    console.log('Exportando:', this.filteredComplaints());
   }
 }

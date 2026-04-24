@@ -46,14 +46,17 @@ export class MainService extends GlobalService {
 	post_Main_ObtenerDenuncias(
 		idPerfil: number = 12,
 		estadoExp: number = 0,
-		prioridades: number = 0
+		prioridades: number = 0,
+		fechaInicio?: Date | null,
+		fechaFin?: Date | null
 	): Observable<HttpResponse<ResponseResultLst<Denuncia>>> {
-		const ahora = new Date().toISOString();
+		const fechaInicioRequest = this.toStartOfDayIso(fechaInicio);
+		const fechaFinRequest = this.toEndOfDayIso(fechaFin);
 		const param: ListarExpedientesDUParam = {
 			idPerfil,
 			busqueda: '',
-			fechaInicio: ahora,
-			fechaFin: ahora,
+			fechaInicio: fechaInicioRequest,
+			fechaFin: fechaFinRequest,
 			estadoExp,
 			prioridades,
 		};
@@ -140,6 +143,24 @@ export class MainService extends GlobalService {
 			cap: texto.includes('cap'),
 			otro: texto.includes('otro'),
 		};
+	}
+
+	private toStartOfDayIso(value?: Date | null): string {
+		if (!value || Number.isNaN(value.getTime())) {
+			return '';
+		}
+
+		const start = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 0, 0, 0, 0);
+		return start.toISOString();
+	}
+
+	private toEndOfDayIso(value?: Date | null): string {
+		if (!value || Number.isNaN(value.getTime())) {
+			return '';
+		}
+
+		const end = new Date(value.getFullYear(), value.getMonth(), value.getDate(), 23, 59, 59, 999);
+		return end.toISOString();
 	}
 }
 

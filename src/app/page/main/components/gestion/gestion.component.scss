@@ -75,3 +75,15 @@
 .placeholder-badge-anim {
   animation: pulse-gentle 2s ease-in-out infinite;
 }
+
+:host ::ng-deep .gestion-results-table .p-datatable-table-container {
+  max-height: 36rem;
+}
+
+:host ::ng-deep .gestion-results-table .p-datatable-thead > tr > th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgb(248 250 252);
+  box-shadow: inset 0 -1px 0 rgb(226 232 240);
+}

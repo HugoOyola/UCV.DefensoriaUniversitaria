@@ -24,109 +24,136 @@
               </p>
             </div>
           </div>
+
+          <div class="flex flex-wrap items-center gap-2 lg:justify-end">
+            @if (hasExecutedSearch()) {
+            <span
+              class="inline-flex items-center rounded-full border border-solid border-cyan-300 bg-cyan-100/90 px-2.5 py-0.5 text-sm font-semibold text-cyan-900">
+              Resultados: {{ filteredComplaints().length }}
+            </span>
+            }
+            <!-- <span
+              class="inline-flex items-center rounded-full border border-solid border-slate-500 bg-slate-700/70 px-2.5 py-0.5 text-sm font-semibold text-slate-100">
+              Total: {{ complaints().length }} Registros
+            </span> -->
+          </div>
         </div>
       </header>
     </ng-template>
 
     <ng-template pTemplate="content">
       <div class="mb-5 rounded-2xl border border-solid border-slate-200 bg-slate-50/80 p-4 md:p-5">
-        <!-- Filtro principal -->
-        <div class="min-w-0 w-full max-w-md">
-          <span class="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
-            <i class="pi pi-calendar text-slate-500"></i>
-            Selecciona un rango de fechas
-          </span>
-          <p class="mb-3 text-xs text-slate-500">Define el periodo para habilitar filtros y resultados.</p>
-          <p-datepicker class="w-[70%]" selectionMode="range" dateFormat="dd/mm/yy" [showIcon]="true"
-            [showButtonBar]="true" [readonlyInput]="true" placeholder="Rango de fechas" [ngModel]="selectedDateRange()"
-            (ngModelChange)="onDateRangeChange($event)" panelStyleClass="gestion-datepicker-panel" appendTo="body">
-          </p-datepicker>
+        @if (!hasExecutedSearch()) {
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
+          <div class="min-w-0">
+            <span class="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <i class="pi pi-calendar text-slate-500"></i>
+              Selecciona un rango de fechas
+            </span>
+            <p class="mb-3 text-xs text-slate-500">Define el periodo para realizar la búsqueda por fechas.</p>
+            <p-datepicker class="w-full md:w-[50%]" selectionMode="range" dateFormat="dd/mm/yy" [showIcon]="true"
+              [showButtonBar]="true" [readonlyInput]="true" placeholder="Rango de fechas"
+              [ngModel]="selectedDateRange()" (ngModelChange)="onDateRangeChange($event)"
+              panelStyleClass="gestion-datepicker-panel" appendTo="body">
+            </p-datepicker>
+          </div>
+
+          <div class="min-w-0">
+            <span class="mb-2 block text-sm font-semibold text-slate-700">
+              <i class="pi pi-search mr-2 text-slate-500"></i>
+              Búsqueda global
+            </span>
+            <p class="mb-3 text-xs text-slate-500">Busca en toda la data cargada desde la API.</p>
+            <div class="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_52px] md:items-center">
+              <div class="relative min-w-0">
+                <input pInputText
+                  class="w-full rounded-lg border border-solid border-gray-300 px-4 py-2 pr-10 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                  placeholder="Buscar por expediente, nombre, DNI o correo..." [ngModel]="searchInputTerm()"
+                  (ngModelChange)="searchInputTerm.set($event)" (keyup.enter)="onBuscar()" />
+
+                @if (searchInputTerm().trim().length > 0) {
+                <button type="button" aria-label="Limpiar búsqueda"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                  (click)="searchInputTerm.set('')">
+                  <i class="pi pi-times"></i>
+                </button>
+                }
+              </div>
+
+              <div class="min-w-0 md:max-w-[52px]">
+                <p-button icon="pi pi-search" ariaLabel="Buscar" severity="contrast" class="w-full" styleClass="w-full"
+                  (onClick)="onBuscar()">
+                </p-button>
+              </div>
+            </div>
+          </div>
         </div>
+        }
 
-        @if (hasSelectedDateRange()) {
+        @if (hasExecutedSearch()) {
         <!-- Filtros secundarios -->
-        <div class="mt-5 border-t border-0 border-solid border-slate-200 pt-4">
-          <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
-            <div class="min-w-0">
-              <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Buscar</span>
-              <div class="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_52px] md:items-center">
-                <div class="relative min-w-0">
-                  <input pInputText
-                    class="w-full rounded-lg border border-solid border-gray-300 px-4 py-2 pr-10 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                    placeholder="Buscar por expediente, nombre, DNI o correo..." [ngModel]="searchInputTerm()"
-                    (ngModelChange)="searchInputTerm.set($event)" (keyup.enter)="onBuscar()" />
+        <div>
+          <div class="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+            <i class="pi pi-sliders-h text-slate-500"></i>
+            <span>Refina los resultados</span>
+            @if (selectedDateRange()?.[0] && selectedDateRange()?.[1]) {
+            <span class="inline-flex items-center gap-1 rounded-full border border-solid border-slate-200 bg-white px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-slate-600">
+              <i class="pi pi-calendar text-[10px] text-slate-500"></i>
+              Periodo: {{ selectedDateRange()?.[0] | date: 'dd/MM/yyyy' }} - {{ selectedDateRange()?.[1] | date: 'dd/MM/yyyy' }}
+            </span>
+            }
+            @if (searchTerm().trim()) {
+            <span class="inline-flex items-center gap-1 rounded-full border border-solid border-cyan-200 bg-cyan-50 px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-cyan-800">
+              <i class="pi pi-search text-[10px] text-cyan-700"></i>
+              Búsqueda: "{{ searchTerm().trim() }}"
+            </span>
+            }
+          </div>
 
-                  @if (searchInputTerm().trim().length > 0) {
-                  <button type="button" aria-label="Limpiar búsqueda"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
-                    (click)="searchInputTerm.set(''); onBuscar()">
-                    <i class="pi pi-times"></i>
-                  </button>
-                  }
-                </div>
+          <div>
+            <div class="flex flex-col gap-4 xl:flex-row xl:flex-wrap xl:items-center">
+            <div class="flex flex-wrap items-center gap-3 xl:flex-1">
+              <div class="w-full min-w-0 sm:w-[180px]">
+                <p-select
+                  class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                  [options]="tipoOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                  placeholder="Tipo de usuario" [ngModel]="selectedTipoUsuario()"
+                  (ngModelChange)="selectedTipoUsuario.set($event)">
+                </p-select>
+              </div>
 
-                <div class="min-w-0 md:max-w-[52px]">
-                  <p-button icon="pi pi-search" ariaLabel="Buscar" severity="contrast" class="w-full"
-                    styleClass="w-full" (onClick)="onBuscar()">
-                  </p-button>
-                </div>
+              <div class="w-full min-w-0 sm:w-[180px]">
+                <p-select
+                  class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                  [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                  placeholder="Estado" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+                </p-select>
+              </div>
+
+              <div class="w-full min-w-0 sm:w-[180px]">
+                <p-select
+                  class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                  [options]="priorityOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                  placeholder="Prioridad" [ngModel]="selectedPriority()"
+                  (ngModelChange)="selectedPriority.set($event)">
+                </p-select>
               </div>
             </div>
 
-            <div class="min-w-0">
-              <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Filtros</span>
-              <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <div class="min-w-0">
-                  <p-select
-                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                    [options]="tipoOptions" optionLabel="label" optionValue="value" [showClear]="true"
-                    placeholder="Todos los tipos" [ngModel]="selectedTipoUsuario()"
-                    (ngModelChange)="selectedTipoUsuario.set($event)">
-                  </p-select>
-                </div>
-
-                <div class="min-w-0">
-                  <p-select
-                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                    [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
-                    placeholder="Todos los estados" [ngModel]="selectedStatus()"
-                    (ngModelChange)="selectedStatus.set($event)">
-                  </p-select>
-                </div>
-
-                <div class="min-w-0">
-                  <p-select
-                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                    [options]="priorityOptions" optionLabel="label" optionValue="value" [showClear]="true"
-                    placeholder="Todas las prioridades" [ngModel]="selectedPriority()"
-                    (ngModelChange)="selectedPriority.set($event)">
-                  </p-select>
-                </div>
-              </div>
+            <p-button label="Nueva búsqueda" icon="pi pi-refresh" severity="info" size="small"
+              styleClass="!bg-cyan-600 !border-cyan-600 hover:!bg-cyan-700 hover:!border-cyan-700"
+              (onClick)="nuevaBusqueda()">
+            </p-button>
             </div>
-          </div>
-
-          <div class="mt-4">
-            <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Detalle</span>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 text-sm">
-            <span
-              class="inline-flex items-center rounded-full border border-solid border-blue-300 bg-white px-3 py-1 font-medium text-blue-600">
-              Resultados: {{ filteredComplaints().length }}
-            </span>
-            <span
-              class="inline-flex items-center rounded-full border border-solid border-red-300 bg-white px-3 py-1 font-medium text-red-600">
-              Registros cargados: {{ complaints().length }}
-            </span>
           </div>
         </div>
         }
       </div>
 
-      @if (!hasSelectedDateRange()) {
+      @if (!hasExecutedSearch()) {
       <div class="mb-4 rounded-xl border border-solid border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        <i class="pi pi-calendar mr-2"></i>
-        Selecciona un rango de fechas para visualizar el listado de denuncias.
+        <i class="pi pi-search mr-2"></i>
+        Selecciona un rango de fechas o usa la búsqueda global para ver las denuncias.
       </div>
       }
 
@@ -137,12 +164,12 @@
       </div>
       }
 
-      @if (hasSelectedDateRange()) {
+      @if (hasExecutedSearch()) {
       <div class="overflow-hidden rounded-2xl border border-solid border-slate-200 bg-white">
         <p-table [value]="filteredComplaints()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
           [totalRecords]="filteredComplaints().length" [showCurrentPageReport]="true"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-          class="p-datatable-sm p-datatable-striped">
+          [scrollable]="true" scrollHeight="36rem" styleClass="gestion-results-table p-datatable-sm p-datatable-striped">
 
           <ng-template pTemplate="colgroup">
             <colgroup>
@@ -339,8 +366,8 @@
                   </p-button>
 
                   <p-button icon="pi pi-history" severity="secondary" size="small" [raised]="true"
-                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900"
-                    pTooltip="Historial" tooltipPosition="top" (onClick)="verHistorialComplaint(complaint)">
+                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900" pTooltip="Historial"
+                    tooltipPosition="top" (onClick)="verHistorialComplaint(complaint)">
                   </p-button>
                 </div>
               </td>
