@@ -11,7 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonComponent } from '@shared/components/skeleon/skeleton.component';
-import { MainService } from '../../services/main.service';
+import { DenunciasService } from '../../services/denuncias.service';
 import {
 	Denuncia,
 	EstadoDenuncia,
@@ -22,6 +22,13 @@ import {
 interface OpcionCampus {
 	label: string;
 	value: string;
+}
+
+type RangoPeriodo = 'all' | '30' | '15' | '7';
+
+interface OpcionPeriodo {
+	label: string;
+	value: RangoPeriodo;
 }
 
 interface TarjetaResumen {
@@ -74,7 +81,7 @@ interface MetricaInferior {
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InicioComponent {
-	private readonly _mainService = inject(MainService);
+	private readonly _denunciasService = inject(DenunciasService);
 	private readonly _router = inject(Router);
 	private static readonly LIMITE_DENUNCIAS = 5;
 
@@ -96,6 +103,7 @@ export class InicioComponent {
 
 	public readonly denuncias = signal<Denuncia[]>([]);
 	public readonly cargando = signal<boolean>(true);
+	// Opciones de campus calculadas dinamicamente desde la data cargada.
 	public readonly opcionesCampus = computed<OpcionCampus[]>(() => {
 		const opciones = Array.from(
 			new Set(this.denuncias().map((denuncia) => this.obtenerNombreCampus(denuncia.filial)))
@@ -114,12 +122,31 @@ export class InicioComponent {
 		{ nonNullable: true }
 	);
 
+	public readonly opcionesPeriodo: OpcionPeriodo[] = [
+		{ label: 'Todos', value: 'all' },
+		{ label: 'Últimos 30 días', value: '30' },
+		{ label: 'Últimos 15 días', value: '15' },
+		{ label: 'Última semana', value: '7' }
+	];
+
+	public readonly periodoControl = new FormControl<OpcionPeriodo>(
+		{ label: 'Últimos 30 días', value: '30' },
+		{ nonNullable: true }
+	);
+
 	private readonly campusSeleccionado = toSignal(
 		this.campusControl.valueChanges.pipe(startWith(this.campusControl.value)),
 		{ initialValue: this.campusControl.value }
 	);
 
+	// Este selector controla el rango consultado al backend.
+	private readonly periodoSeleccionado = toSignal(
+		this.periodoControl.valueChanges.pipe(startWith(this.periodoControl.value)),
+		{ initialValue: this.periodoControl.value }
+	);
+
 	public readonly tarjetasResumen = computed<TarjetaResumen[]>(() => {
+		// Tarjetas KPI sobre la lista ya cargada en memoria.
 		const denuncias = this.denuncias();
 		const total = denuncias.length;
 		const pendientes = denuncias.filter((denuncia) => denuncia.estado === 'Pendiente').length;
@@ -155,6 +182,7 @@ export class InicioComponent {
 	});
 
 	public readonly distribucionUsuarios = computed<DistribucionUsuario[]>(() => {
+		// Distribucion por tipo de usuario para el bloque de barras.
 		const total = this.denuncias().length;
 		const conteo = this.denuncias().reduce((acumulado, denuncia) => {
 			const tipo = denuncia.tipoUsuario;
@@ -172,6 +200,7 @@ export class InicioComponent {
 	});
 
 	public readonly denunciasRecientes = computed<DenunciaReciente[]>(() =>
+		// Se ordena descendente para mostrar primero lo mas reciente.
 		[...this.denuncias()]
 			.sort((denunciaA, denunciaB) => denunciaB.fecha.getTime() - denunciaA.fecha.getTime())
 			.map((denuncia) => ({
@@ -184,6 +213,7 @@ export class InicioComponent {
 	);
 
 	public readonly denunciasFiltradas = computed(() => {
+		// Filtro local por campus sobre el resultado ya limitado por periodo.
 		const campus = this.campusSeleccionado()?.value ?? 'all';
 		const denunciasFiltradas =
 			campus === 'all'
@@ -194,6 +224,7 @@ export class InicioComponent {
 	});
 
 	public readonly metricasInferiores = computed<MetricaInferior[]>(() => {
+		// Indicadores operativos del bloque inferior.
 		const denuncias = this.denuncias();
 		const total = denuncias.length;
 		const conApoderado = denuncias.filter((denuncia) => denuncia.isApoderado).length;
@@ -227,10 +258,10 @@ export class InicioComponent {
 
 	constructor() {
 		effect(() => {
-			this.campusSeleccionado();
+			// Cada cambio de periodo vuelve a consultar denuncias.
+			const periodo = this.periodoSeleccionado()?.value ?? '30';
+			this.cargarDenuncias(periodo);
 		});
-
-		this.cargarDenuncias();
 	}
 
 	irAGestion(): void {
@@ -290,14 +321,20 @@ export class InicioComponent {
 		}
 	}
 
-	private cargarDenuncias(): void {
+	private cargarDenuncias(periodo: RangoPeriodo = '30'): void {
 		this.cargando.set(true);
+		// Traduce la opcion seleccionada a fechas para el endpoint.
+		const { fechaInicio, fechaFin } = this.obtenerRangoPeriodo(periodo);
 
-		this._mainService
-			.post_Main_ObtenerDenuncias()
+		this._denunciasService
+			.listarDenuncias({
+				idPerfil: 12,
+				fechaInicio,
+				fechaFin
+			})
 			.subscribe({
-				next: (response) => {
-					this.denuncias.set(response.body?.lstItem ?? []);
+				next: (data) => {
+					this.denuncias.set(data);
 				},
 				error: () => {
 					this.denuncias.set([]);
@@ -307,6 +344,34 @@ export class InicioComponent {
 					this.cargando.set(false);
 				}
 			});
+	}
+
+	private obtenerRangoPeriodo(periodo: RangoPeriodo): { fechaInicio?: Date; fechaFin?: Date } {
+		if (periodo === 'all') {
+			// Rango amplio para representar "todos" en un backend que exige fechas.
+			return {
+				fechaInicio: new Date(2000, 0, 1),
+				fechaFin: new Date()
+			};
+		}
+
+		const fechaFin = new Date();
+		const fechaInicio = new Date(fechaFin);
+
+		switch (periodo) {
+			case '7':
+				fechaInicio.setDate(fechaInicio.getDate() - 7);
+				break;
+			case '15':
+				fechaInicio.setDate(fechaInicio.getDate() - 15);
+				break;
+			case '30':
+			default:
+				fechaInicio.setDate(fechaInicio.getDate() - 30);
+				break;
+		}
+
+		return { fechaInicio, fechaFin };
 	}
 
 	private obtenerNombreCampus(filial: string | number | null | undefined): string {

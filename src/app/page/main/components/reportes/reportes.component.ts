@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import {MainService} from '../../services/main.service';
+import {DenunciasService} from '../../services/denuncias.service';
 import {Denuncia, EstadoDenuncia, PrioridadDenuncia} from '../../interface/denuncias.interface';
 
 interface ReporteCampus {
@@ -18,10 +18,9 @@ interface ReporteCampus {
 	templateUrl: './reportes.component.html',
 	styleUrl: './reportes.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [MainService],
 })
 export class ReportesComponent {
-	private readonly mainService = inject(MainService);
+	private readonly denunciasService = inject(DenunciasService);
 
 	public readonly cargando = signal(true);
 	public readonly errorCarga = signal<string | null>(null);
@@ -41,11 +40,13 @@ export class ReportesComponent {
 	};
 
 	public readonly opcionesCampus = computed<string[]>(() => {
+		// Opciones de campus derivadas de la data actual.
 		const values = new Set(this.denuncias().map((item) => this.obtenerCampus(item.filial)));
 		return ['Todos', ...Array.from(values).sort((a, b) => a.localeCompare(b))];
 	});
 
 	public readonly denunciasFiltradas = computed<Denuncia[]>(() => {
+		// Filtro combinado: estado + prioridad + campus + texto.
 		const estado = this.filtroEstado();
 		const prioridad = this.filtroPrioridad();
 		const campus = this.filtroCampus();
@@ -74,6 +75,7 @@ export class ReportesComponent {
 	});
 
 	public readonly resumen = computed(() => {
+		// Totales del tablero calculados sobre la lista filtrada.
 		const data = this.denunciasFiltradas();
 		return {
 			total: data.length,
@@ -84,6 +86,7 @@ export class ReportesComponent {
 	});
 
 	public readonly reportePorCampus = computed<ReporteCampus[]>(() => {
+		// Agrupa por campus para tabla de resumen territorial.
 		const base = this.denunciasFiltradas().reduce((acc, item) => {
 			const campus = this.obtenerCampus(item.filial);
 			if (!acc[campus]) {
@@ -100,53 +103,54 @@ export class ReportesComponent {
 	});
 
 	constructor() {
+		// Carga inicial del modulo de reportes.
 		this.cargar();
 	}
 
-	public limpiarFiltros(): void {
-		this.filtroEstado.set('Todos');
-		this.filtroPrioridad.set('Todos');
-		this.filtroCampus.set('Todos');
-		this.filtroTexto.set('');
-	}
+	// public limpiarFiltros(): void {
+	// 	this.filtroEstado.set('Todos');
+	// 	this.filtroPrioridad.set('Todos');
+	// 	this.filtroCampus.set('Todos');
+	// 	this.filtroTexto.set('');
+	// }
 
-	public exportarCsv(): void {
-		const registros = this.denunciasFiltradas();
-		const headers = ['Expediente', 'Fecha', 'Campus', 'Estado', 'Prioridad', 'Persona', 'Documento', 'Correo'];
+	// public exportarCsv(): void {
+	// 	const registros = this.denunciasFiltradas();
+	// 	const headers = ['Expediente', 'Fecha', 'Campus', 'Estado', 'Prioridad', 'Persona', 'Documento', 'Correo'];
 
-		const rows = registros.map((item) => [
-			item.expediente,
-			new Date(item.fecha).toISOString(),
-			this.obtenerCampus(item.filial),
-			this.getEstadoLabel(item.estado),
-			this.getPrioridadLabel(item.prioridad),
-			`${item.nombre} ${item.apellidos}`,
-			item.documento,
-			item.email,
-		]);
+	// 	const rows = registros.map((item) => [
+	// 		item.expediente,
+	// 		new Date(item.fecha).toISOString(),
+	// 		this.obtenerCampus(item.filial),
+	// 		this.getEstadoLabel(item.estado),
+	// 		this.getPrioridadLabel(item.prioridad),
+	// 		`${item.nombre} ${item.apellidos}`,
+	// 		item.documento,
+	// 		item.email,
+	// 	]);
 
-		const csv = [headers, ...rows]
-			.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-			.join('\n');
+	// 	const csv = [headers, ...rows]
+	// 		.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+	// 		.join('\n');
 
-		const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-		const url = URL.createObjectURL(blob);
-		const anchor = document.createElement('a');
-		anchor.href = url;
-		anchor.download = 'reporte-denuncias.csv';
-		anchor.click();
-		URL.revokeObjectURL(url);
-	}
+	// 	const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+	// 	const url = URL.createObjectURL(blob);
+	// 	const anchor = document.createElement('a');
+	// 	anchor.href = url;
+	// 	anchor.download = 'reporte-denuncias.csv';
+	// 	anchor.click();
+	// 	URL.revokeObjectURL(url);
+	// }
 
-	public obtenerCampusLabel(filial: string | number | null): string {
+	obtenerCampusLabel(filial: string | number | null): string {
 		return this.obtenerCampus(filial);
 	}
 
-	public getEstadoLabel(estado: EstadoDenuncia | null | undefined): string {
+	getEstadoLabel(estado: EstadoDenuncia | null | undefined): string {
 		return estado ?? 'Sin Atender';
 	}
 
-	public getPrioridadLabel(prioridad: PrioridadDenuncia | null | undefined): string {
+	getPrioridadLabel(prioridad: PrioridadDenuncia | null | undefined): string {
 		return prioridad ?? 'Sin Prioridad';
 	}
 
@@ -154,13 +158,13 @@ export class ReportesComponent {
 		this.cargando.set(true);
 		this.errorCarga.set(null);
 
-		this.mainService.getDenuncias().subscribe({
+		this.denunciasService.listarDenuncias({ idPerfil: 12 }).subscribe({
 			next: (data) => {
 				this.denuncias.set(data);
 			},
 			error: () => {
 				this.denuncias.set([]);
-				this.errorCarga.set('No se pudo cargar los reportes desde la data mock.');
+				this.errorCarga.set('No se pudo cargar los reportes desde el servicio centralizado.');
 				this.cargando.set(false);
 			},
 			complete: () => {

@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
-import {MainService} from '../../services/main.service';
+import {DenunciasService} from '../../services/denuncias.service';
 import {Denuncia, EstadisticasDenuncia, EstadoDenuncia, PrioridadDenuncia, TipoUsuarioDenuncia} from '../../interface/denuncias.interface';
 
 interface SerieEstadoItem {
@@ -21,10 +21,9 @@ interface TopCampusItem {
 	templateUrl: './estadisticas.component.html',
 	styleUrl: './estadisticas.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	providers: [MainService],
 })
 export class EstadisticasComponent {
-	private readonly mainService = inject(MainService);
+	private readonly denunciasService = inject(DenunciasService);
 
 	public readonly cargando = signal(true);
 	public readonly errorCarga = signal<string | null>(null);
@@ -47,6 +46,7 @@ export class EstadisticasComponent {
 	};
 
 	public readonly resumen = computed<EstadisticasDenuncia>(() => {
+		// Consolidado base; de aqui salen todas las series de la vista.
 		const lista = this.denuncias();
 		const inicial: EstadisticasDenuncia = {
 			total: lista.length,
@@ -81,6 +81,7 @@ export class EstadisticasComponent {
 	});
 
 	public readonly serieEstado = computed<SerieEstadoItem[]>(() => {
+		// Serie para barras por estado (incluye "Sin Atender" derivado).
 		const total = this.resumen().total;
 		const sinAtender = this.denuncias().filter((x) => !x.estado || x.estado === 'Sin Atender').length;
 		return [
@@ -92,6 +93,7 @@ export class EstadisticasComponent {
 	});
 
 	public readonly seriePrioridad = computed<Array<{prioridad: PrioridadDenuncia; cantidad: number; porcentaje: number}>>(() => {
+		// Serie de prioridad usando el consolidado del resumen.
 		const total = this.resumen().total;
 		return [
 			{prioridad: 'Alta', cantidad: this.resumen().porPrioridad.Alta, porcentaje: this.getPorcentaje(this.resumen().porPrioridad.Alta, total)},
@@ -101,6 +103,7 @@ export class EstadisticasComponent {
 	});
 
 	public readonly serieTipoUsuario = computed<Array<{tipo: string; cantidad: number; porcentaje: number}>>(() => {
+		// Ranking por tipo de usuario para la tabla/grafico de distribucion.
 		const total = this.resumen().total;
 		const porTipo = this.resumen().porTipoUsuario;
 		return (Object.keys(porTipo) as TipoUsuarioDenuncia[])
@@ -113,6 +116,7 @@ export class EstadisticasComponent {
 	});
 
 	public readonly topCampus = computed<TopCampusItem[]>(() => {
+		// Ranking de campus por volumen de denuncias.
 		const acumulado = this.denuncias().reduce((acc, denuncia) => {
 			const campus = this.obtenerCampus(denuncia.filial);
 			acc[campus] = (acc[campus] ?? 0) + 1;
@@ -131,6 +135,7 @@ export class EstadisticasComponent {
 	});
 
 	constructor() {
+		// Carga inicial de estadisticas.
 		this.cargar();
 	}
 
@@ -138,13 +143,13 @@ export class EstadisticasComponent {
 		this.cargando.set(true);
 		this.errorCarga.set(null);
 
-		this.mainService.getDenuncias().subscribe({
+		this.denunciasService.listarDenuncias({ idPerfil: 12 }).subscribe({
 			next: (data) => {
 				this.denuncias.set(data);
 			},
 			error: () => {
 				this.denuncias.set([]);
-				this.errorCarga.set('No se pudo cargar las estadisticas con el origen mock.');
+				this.errorCarga.set('No se pudo cargar las estadísticas desde el servicio centralizado.');
 				this.cargando.set(false);
 			},
 			complete: () => {
@@ -154,6 +159,7 @@ export class EstadisticasComponent {
 	}
 
 	private getPorcentaje(valor: number, total: number): number {
+		// Evita division por cero y estandariza el redondeo.
 		if (!total) return 0;
 		return Number(((valor / total) * 100).toFixed(1));
 	}

@@ -69,16 +69,29 @@
         </p>
       </div>
 
-      <div class="w-full max-w-xs">
-        <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Filtrar últimos casos por campus
-        </label>
+      <div class="w-full max-w-2xl">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Periodo
+            </label>
 
-        <p-select [options]="opcionesCampus()" [formControl]="campusControl" optionLabel="label"
-          placeholder="Todos los campus" class="w-full" appendTo="body" />
+            <p-select [options]="opcionesPeriodo" [formControl]="periodoControl" optionLabel="label"
+              placeholder="Últimos 30 días" class="w-full" appendTo="body" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Campus
+            </label>
+
+            <p-select [options]="opcionesCampus()" [formControl]="campusControl" optionLabel="label"
+              placeholder="Todos los campus" class="w-full" appendTo="body" />
+          </div>
+        </div>
 
         <p class="mt-2 text-xs text-slate-500">
-          Muestra hasta 5 reclamos o denuncias recientes del campus seleccionado.
+          Por defecto se muestran denuncias de los últimos 30 días. Puedes cambiar a 15 días, última semana o todos.
         </p>
       </div>
     </header>

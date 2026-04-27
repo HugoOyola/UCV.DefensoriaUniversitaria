@@ -8,11 +8,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { PrimeNG } from 'primeng/config';
 import { GestionarModalComponent } from '@app/page/main/components/gestion/modales/gestionar/gestionar-modal.component';
 import { ResponderModalComponent } from '@app/page/main/components/gestion/modales/responder/responder-modal.component';
 import { DerivarModalComponent } from '@app/page/main/components/gestion/modales/derivar/derivar-modal.component';
-import { MainService } from '../../services/main.service';
+import { DenunciasService } from '../../services/denuncias.service';
 import {
   Denuncia,
   DerivacionDenuncia,
@@ -57,11 +56,9 @@ type PrioridadUi = {
   templateUrl: './gestion.component.html',
   styleUrl: './gestion.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [MainService],
 })
 export class GestionComponent {
-  private readonly mainService = inject(MainService);
-  private readonly primeNgConfig = inject(PrimeNG);
+  private readonly denunciasService = inject(DenunciasService);
 
   public readonly datePickerLocale = {
     firstDayOfWeek: 1,
@@ -107,6 +104,7 @@ export class GestionComponent {
   public mostrarModalDerivar = signal(false);
   public mostrarModalHistorial = signal(false);
 
+  // Estado de busqueda/filtros en UI.
   public searchInputTerm = signal('');
   public searchTerm = signal('');
   public searchMode = signal<'none' | 'date' | 'text'>('none');
@@ -115,6 +113,7 @@ export class GestionComponent {
   public selectedStatus = signal<EstadoDenuncia | null>(null);
   public selectedPriority = signal<PrioridadDenuncia | null>(null);
   public selectedDateRange = signal<Date[] | null>(null);
+  public cargando = signal(true);
   public errorCarga = signal<string | null>(null);
 
   public tipoOptions = [
@@ -210,7 +209,8 @@ export class GestionComponent {
   };
 
   constructor() {
-    this.primeNgConfig.setTranslation(this.datePickerLocale);
+    // Carga inicial: requiere rango de fechas valido para consultar.
+    this.cargarDenuncias();
   }
 
   private cargarDenuncias(dateRange: Date[] | null = null): void {
@@ -222,6 +222,7 @@ export class GestionComponent {
       !Number.isNaN(endDate.getTime());
 
     if (!hasCompleteRange) {
+      // Sin rango completo no se consulta al backend.
       return;
     }
 
@@ -230,22 +231,32 @@ export class GestionComponent {
     const fechaInicio = hasCompleteRange ? startDate : null;
     const fechaFin = hasCompleteRange ? endDate : null;
 
-    this.mainService.post_Main_ObtenerDenuncias(12, 0, 0, fechaInicio, fechaFin).subscribe({
-      next: (response) => {
-        this.complaints.set(response.body?.lstItem ?? []);
-      },
-      error: (error) => {
-        console.error('Error al cargar las denuncias:', error);
-        this.complaints.set([]);
-        this.errorCarga.set('No se pudo cargar el listado de denuncias.');
-      },
-    });
+    this.denunciasService
+      .listarDenuncias({
+        idPerfil: 12,
+        estadoExp: 0,
+        prioridades: 0,
+        fechaInicio,
+        fechaFin,
+      })
+      .subscribe({
+        next: (denuncias) => {
+          // Lista base que alimenta tabla y calculos/filtros locales.
+          this.complaints.set(denuncias);
+        },
+        error: (error) => {
+          console.error('Error al cargar las denuncias:', error);
+          this.complaints.set([]);
+          this.errorCarga.set('No se pudo cargar el listado de denuncias.');
+        },
+      });
   }
 
   onDateRangeChange(value: Date[] | null): void {
     this.selectedDateRange.set(value);
 
     if (this.hasSelectedDateRange()) {
+      // Filtro por fecha: consulta backend con el rango elegido.
       this.cargarDenuncias(value);
       this.searchMode.set('date');
       this.hasExecutedSearch.set(true);
@@ -275,6 +286,7 @@ export class GestionComponent {
   }
 
   nuevaBusqueda(): void {
+    // Reinicia filtros visuales; no dispara consulta hasta seleccionar fecha o buscar.
     this.selectedDateRange.set(null);
     this.searchInputTerm.set('');
     this.searchTerm.set('');
@@ -286,6 +298,7 @@ export class GestionComponent {
   }
 
   public filteredComplaints = computed(() => {
+    // Filtro final combinado: modo de busqueda + filtros por columnas.
     const mode = this.searchMode();
     const term = this.searchTerm().trim().toLowerCase();
     const tipoUsuario = this.selectedTipoUsuario();
@@ -333,6 +346,7 @@ export class GestionComponent {
   });
 
   public hasSelectedDateRange = computed(() => {
+    // Indica si el DatePicker tiene ambas fechas validas.
     const dateRange = this.selectedDateRange();
     if (!dateRange || dateRange.length < 2) {
       return false;
@@ -502,6 +516,7 @@ export class GestionComponent {
   }
 
   manejarDerivacion(derivacion: DerivacionDenuncia): void {
+    // Refleja en UI la derivacion sin recargar toda la tabla.
     this.complaints.update((lista) =>
       lista.map((item) => {
         if (item.expediente !== derivacion.expediente) return item;
