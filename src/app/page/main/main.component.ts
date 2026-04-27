@@ -1,17 +1,16 @@
-import {Component, HostListener, effect, inject} from '@angular/core';
-import {MainService} from './services/main.service';
-import {AuthService} from '@auth/auth.service';
-import {SkeletonComponent} from '@shared/components/skeleon/skeleton.component';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
-import {NgClass} from '@angular/common';
-import {PerfilesSharedService} from '@shared/services/perfiles-shared.service';
-import {EncryptionService} from '@auth/encryption.service';
-import {MainSharedService} from '@shared/services/main-shared.service';
-import {ModuleService} from '@shared/services/module.service';
-import {SidebarComponent} from '@shared/components/sidebar/sidebar.component';
-import {Sidebar, SidebarFooter} from './sidebar';
-import {RouterOutlet} from '@angular/router';
+import { Component, HostListener, effect, inject } from '@angular/core';
+import { MainService } from './services/main.service';
+import { AuthService } from '@auth/auth.service';
+import { SkeletonComponent } from '@shared/components/skeleon/skeleton.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { PerfilesSharedService } from '@shared/services/perfiles-shared.service';
+import { EncryptionService } from '@auth/encryption.service';
+import { MainSharedService } from '@shared/services/main-shared.service';
+import { ModuleService } from '@shared/services/module.service';
+import { SidebarComponent } from '@shared/components/sidebar/sidebar.component';
+import { Sidebar, SidebarFooter } from './sidebar';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
 	selector: 'app-main',
@@ -50,17 +49,17 @@ export class MainComponent {
 	showw($event: boolean): void {
 		this.menuShow = $event;
 	}
-	@HostListener('window:message', ['$event'])
-	onMessage(event: MessageEvent): void {
-		if (this._mainSharedService.cPerCodigo() === '') {
-			console.log('😎😋 =>', event.source);
-			if (event.source) {
-				// Verificar el origen para mayor seguridad
-				console.log('event.data =>', event.data);
-				// const data_cPercodigo = event.data.cPercodigo;
-			}
-		}
-	}
+	// @HostListener('window:message', ['$event'])
+	// onMessage(event: MessageEvent): void {
+	// 	if (this._mainSharedService.cPerCodigo() === '') {
+	// 		console.log('😎😋 =>', event.source);
+	// 		if (event.source) {
+	// 			// Verificar el origen para mayor seguridad
+	// 			console.log('event.data =>', event.data);
+	// 			// const data_cPercodigo = event.data.cPercodigo;
+	// 		}
+	// 	}
+	// }
 
 	cargarDatosNuevos(cPerCodigo: string): void {
 		this._mainSharedService.cPerCodigo.set(cPerCodigo);
@@ -73,8 +72,8 @@ export class MainComponent {
 					console.log('v =>', v);
 					this._mainSharedService.datosPersonales.set(v.body?.lstItem[0] ?? null);
 				},
-				error: (e) => {},
-				complete: () => {},
+				error: (e) => { },
+				complete: () => { },
 			});
 		}
 	}
