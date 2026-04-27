@@ -1,7 +1,7 @@
-import {inject, Injectable} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
-import {from, Observable} from 'rxjs';
-import {DialogComponent} from '../components/dialog/dialog.component';
+import { inject, Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { from, Observable } from 'rxjs';
+import { DialogComponent } from '../components/dialog/dialog.component';
 
 @Injectable({
 	providedIn: 'root',
@@ -16,7 +16,7 @@ export class SharedCoreService {
 	 */
 	openDialog(Num_Config: number, Mensaje = '', ArrayData = []): Observable<any> {
 		const dialogRef = this._dialog.open(DialogComponent, {
-			data: {Num_Config, Mensaje, ArrayData},
+			data: { Num_Config, Mensaje, ArrayData },
 			panelClass: 'custom-modalbox',
 			autoFocus: false,
 		});

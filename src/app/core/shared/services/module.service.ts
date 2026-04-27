@@ -1,12 +1,12 @@
-import {Injectable, inject, signal} from '@angular/core';
-import {Router} from '@angular/router';
-import {EncryptionService} from '@auth/encryption.service';
-import {environment} from '@environment/environment';
-import {MainSharedService} from '@shared/services/main-shared.service';
-import {PerfilesSharedService} from '@shared/services/perfiles-shared.service';
+import { Injectable, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { EncryptionService } from '@auth/encryption.service';
+import { environment } from '@environment/environment';
+import { MainSharedService } from '@shared/services/main-shared.service';
+import { PerfilesSharedService } from '@shared/services/perfiles-shared.service';
 interface DatosModuloNew {
 	url: string;
-	data: Partial<{type: 'TrilceUCV'; data: object}>;
+	data: Partial<{ type: 'TrilceUCV'; data: object }>;
 }
 @Injectable({
 	providedIn: 'root',
@@ -33,7 +33,7 @@ export class ModuleService {
 	});
 	actualizarDatosModulo(DatosModuloNew: Partial<DatosModuloNew>): void {
 		this.datosModuloSignal.update((prev) => {
-			return {...prev, ...DatosModuloNew};
+			return { ...prev, ...DatosModuloNew };
 		});
 	}
 
@@ -46,7 +46,7 @@ export class ModuleService {
 		} else {
 			url = moduloQa;
 		}
-		this.actualizarDatosModulo({url: url});
+		this.actualizarDatosModulo({ url: url });
 		this._router.navigate(['/modulo']);
 	}
 	// * Matricula Administrativa

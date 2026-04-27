@@ -1,7 +1,7 @@
-import {Injectable, inject, signal} from '@angular/core';
-import {ModuleService} from '@shared/services/module.service';
-import {AccesoRapido} from 'src/app/page/main/interface/principal';
-import {MainSharedService} from './main-shared.service';
+import { Injectable, inject, signal } from '@angular/core';
+import { ModuleService } from '@shared/services/module.service';
+import { AccesoRapido } from 'src/app/page/main/interface/principal';
+import { MainSharedService } from './main-shared.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -10,7 +10,7 @@ export class RecomendadoSharedService {
 	private _moduleService = inject(ModuleService);
 	private _mainSharedService = inject(MainSharedService);
 
-	public AlumnoRecomendado = signal<{name: string; icon: string; abrirTrilce: boolean}[]>([
+	public AlumnoRecomendado = signal<{ name: string; icon: string; abrirTrilce: boolean }[]>([
 		{
 			name: 'Mis solicitudes',
 			icon: 'description',
@@ -62,7 +62,7 @@ export class RecomendadoSharedService {
 			abrirTrilce: true,
 		},
 	]);
-	public DocenteRecomendado = signal<{name: string; icon: string; abrirTrilce: boolean}[]>([
+	public DocenteRecomendado = signal<{ name: string; icon: string; abrirTrilce: boolean }[]>([
 		{
 			name: 'Mis Asignaturas Asignadas',
 			icon: 'library_books',
@@ -104,7 +104,7 @@ export class RecomendadoSharedService {
 			abrirTrilce: true,
 		},
 	]);
-	public AdministrativoRecomendado = signal<{name: string; icon: string; abrirTrilce: boolean}[]>([
+	public AdministrativoRecomendado = signal<{ name: string; icon: string; abrirTrilce: boolean }[]>([
 		{
 			name: 'Ver CV',
 			icon: 'description',

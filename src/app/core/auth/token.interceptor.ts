@@ -1,9 +1,9 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import {SpinnerService} from './spinner.service';
-import {AuthService} from './auth.service';
-import {inject} from '@angular/core';
-import {environment} from '@environment/environment';
-import {catchError, finalize, switchMap, throwError, timer} from 'rxjs';
+import { SpinnerService } from './spinner.service';
+import { AuthService } from './auth.service';
+import { inject } from '@angular/core';
+import { environment } from '@environment/environment';
+import { catchError, finalize, switchMap, throwError, timer } from 'rxjs';
 
 const tokenUrls = Object.values(environment.ls_apis).map((api) => api.token.tokenUrl);
 const listUrl = [environment.ip, ...tokenUrls];
@@ -17,8 +17,6 @@ export const tokenInterceptor: HttpInterceptorFn = (request, next) => {
 	const MAXIMO_INTENTOS = environment.configInterceptor.MAXIMO_INTENTOS;
 	const TIEMPO_ESPERA_MS = environment.configInterceptor.TIEMPO_ESPERA_MS;
 	console.log('🔗 interceptor =>', request.url);
-	// console.log('listUrl =>', listUrl);
-	// console.log('listUrl =>', req.url);
 	// % Spinner Loading
 	const shouldShowSpinner = request.params.has('showSpinner') ? request.params.get('showSpinner') === 'true' : true;
 	if (listUrl.includes(request.url)) {
@@ -42,38 +40,76 @@ export const tokenInterceptor: HttpInterceptorFn = (request, next) => {
 			let intentos = 0;
 			return next(request).pipe(
 				catchError((error, caught) => {
-					if ((error.status !== 500 && error.status !== 401 && error.status !== 503) || intentos === MAXIMO_INTENTOS) {
+					// console.warn('intentos =>', intentos);
+					// console.warn('MAXIMO_INTENTOS =>', MAXIMO_INTENTOS);
+					// console.warn('error.status =>', error.status);
+					if (error.status !== 500 && error.status !== 401 && error.status !== 503) {
+						// console.warn('1 =>', 1);
 						return throwError(() => error);
 					}
 					if (error.status === 500 || error.status === 503) {
-						return next(request).pipe(
-							catchError((err, cau) => {
-								if (intentos === MAXIMO_INTENTOS) {
-									return throwError(() => error);
-								}
-								intentos++;
-								return timer(TIEMPO_ESPERA_MS).pipe(switchMap(() => cau));
-							})
-						);
+						// console.warn('2 =>', 2);
+						if (intentos >= MAXIMO_INTENTOS) {
+							return throwError(() => error);
+						}
+						intentos++;
+						// Usamos caught para mantener la cadena de reintentos
+						return timer(TIEMPO_ESPERA_MS).pipe(switchMap(() => caught));
 					}
-					if (error.status == 401) {
-						return _authService.getToken(_apis.tokenUrl, _apis.user, _apis.pass).pipe(
-							switchMap((data: any) => {
-								_authService.setItem(_apis.name, data.expires_in, data.access_token);
-								request = request.clone({
-									setHeaders: {
-										authorization: `Bearer ${localStorage.getItem(`token_${_apis.name}`)}`,
-									},
-								});
-								return next(request);
-							}),
-							catchError((err) => {
-								return throwError(() => err);
-							})
-						);
+					if (error.status === 401) {
+						intentos = 0; // Reiniciamos intentos en caso de error 401
+						// console.warn('3 =>', 3);
+						if (_apis.user === '' && _apis.pass === '') {
+							return _authService.getTokenRefreshToken().pipe(
+								switchMap((data) => {
+									_authService.setItemTokenRefreshToken(data.access_token, data.refresh_token);
+									request = request.clone({
+										setHeaders: {
+											authorization: `Bearer ${localStorage.getItem(`token_${_apis.name}`)}`,
+										},
+									});
+									return next(request).pipe(
+										catchError((error) => {
+											// Si falla con 500 o 503, aplicamos la lógica de reintentos
+											if (error.status === 500 || error.status === 503) {
+												return timer(TIEMPO_ESPERA_MS).pipe(switchMap(() => caught));
+											}
+											return throwError(() => error);
+										})
+									);
+								}),
+								catchError((err) => {
+									return throwError(() => err);
+								})
+							);
+						} else {
+							return _authService.getToken(_apis.tokenUrl, _apis.user, _apis.pass).pipe(
+								switchMap((data) => {
+									_authService.setItem(_apis.name, data.expires_in, data.access_token);
+									request = request.clone({
+										setHeaders: {
+											authorization: `Bearer ${localStorage.getItem(`token_${_apis.name}`)}`,
+										},
+									});
+									return next(request).pipe(
+										catchError((error) => {
+											// Si falla con 500 o 503, aplicamos la lógica de reintentos
+											if (error.status === 500 || error.status === 503) {
+												return timer(TIEMPO_ESPERA_MS).pipe(switchMap(() => caught));
+											}
+											return throwError(() => error);
+										})
+									);
+								}),
+								catchError((err) => {
+									return throwError(() => err);
+								})
+							);
+						}
 					}
-					intentos++;
-					return timer(TIEMPO_ESPERA_MS).pipe(switchMap(() => caught));
+					// console.warn('4 =>', 4);
+					// intentos++;
+					return throwError(() => error);
 				}),
 				finalize(() => {
 					if (shouldShowSpinner) {
@@ -119,9 +155,8 @@ function obtenerDominio(url: string): {
 } | null {
 	let data;
 	const regex = /^https?:\/\/[^/]+\/([^/]+)/;
-	const match = url.match(regex);
+	const match = regex.exec(url);
 	const urlGlobal = match ? match[1] : '';
-	// console.log(' =>', urlGlobal);
 	if (environment.local) {
 		return {
 			name: '',
@@ -131,13 +166,10 @@ function obtenerDominio(url: string): {
 		};
 	} else {
 		for (const api of Object.values(environment.ls_apis)) {
-			// console.log(' =>', api);
 			const routeKeys = Object.keys(api.routes);
 			for (const routeKey of routeKeys) {
-				// console.log(' =>', routeKey);
 				if (urlGlobal === routeKey) {
 					data = api.token;
-					// console.log(' =>', api.token);
 					return data;
 				}
 			}

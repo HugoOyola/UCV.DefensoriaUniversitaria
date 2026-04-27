@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {Injectable, inject} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {environment} from '../../../environments/environment.development';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 interface IpResponse {
 	ip: string;
 }

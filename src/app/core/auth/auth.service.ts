@@ -2,12 +2,15 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {forkJoin, Observable, retry} from 'rxjs';
 import {environment} from '@environment/environment';
+import { MainSharedService } from '../shared/services/main-shared.service';
+import { payloadJWT } from '../shared/utils/payloadJWT';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AuthService {
 	private _http = inject(HttpClient);
+	private _mainSharedService = inject(MainSharedService);
 
 	constructor() {}
 	getToken(tokenUrl: string, user: string, pass: string): Observable<any> {
@@ -52,7 +55,7 @@ export class AuthService {
 					.subscribe({
 						next: (v) => {
 							this.setItem(name, v.expires_in, v.access_token);
-							apiToken_observer.complete();
+						setTimeout(() => apiToken_observer.complete(), 25);
 						},
 						error: (e) => {
 							console.log(`Error Token ${name} =>`, e);
@@ -67,5 +70,19 @@ export class AuthService {
 			}
 		});
 		return ob$;
+	}
+		getTokenRefreshToken(): Observable<any> {
+		const apiReshToken = environment.apiRefreshToken;
+		const header = new HttpHeaders({
+			Authorization: `Bearer ${this._mainSharedService.refreshToken()}`,
+		});
+		return this._http.post(apiReshToken, null, {headers: header});
+	}
+	setItemTokenRefreshToken(access_token: string, refresh_token: string): void {
+		this._mainSharedService.accessToken.set(access_token);
+		this._mainSharedService.refreshToken.set(refresh_token);
+		const fecha = new Date(payloadJWT(this._mainSharedService.accessToken()).exp * 1000);
+		localStorage.setItem(`token_authjwt`, this._mainSharedService.accessToken());
+		localStorage.setItem(`expires_authjwt`, fecha.toString());
 	}
 }
