@@ -1,27 +1,29 @@
 <section class="bg-slate-100 px-6 py-4">
   <p-card class="overflow-hidden rounded-3xl border border-solid border-slate-200 bg-white shadow-sm">
     <ng-template pTemplate="header">
-      <header class="relative border-b border-0 border-solid border-slate-800 bg-slate-800 px-5 py-5 md:px-6 md:py-6">
+      <header
+        class="relative isolate overflow-hidden border-b border-0 border-solid border-slate-800 bg-slate-800 px-5 py-5 md:px-6 md:py-4">
         <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-slate-600/40 blur-xl"></div>
         <div class="absolute -bottom-12 right-24 h-28 w-28 rounded-full bg-cyan-500/20 blur-xl"></div>
 
         <div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div class="flex items-start gap-4">
-            <div
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-solid border-slate-500 bg-slate-600">
-              <i class="pi pi-users text-lg text-slate-100"></i>
-            </div>
-
-            <div>
-              <span
-                class="mb-2 inline-flex rounded-full border border-solid border-cyan-300/45 bg-cyan-300/20 px-3 py-1 text-xs font-bold tracking-[0.16em] text-cyan-100">SEGUIMIENTO
-                OPERATIVO</span>
-              <h3 class="text-xl font-extrabold tracking-tight text-slate-100 md:text-2xl">
-                Monitoreo de Denuncias / Reclamos
-              </h3>
-              <p class="mt-1 text-sm text-slate-300 md:text-base">
-                Visualiza y gestiona las denuncias y reclamos presentados por los estudiantes.
-              </p>
+          <div>
+            <span
+              class="mb-2 inline-flex rounded-full border border-solid border-cyan-300/45 bg-cyan-300/20 px-3 py-1 text-[7px] font-bold tracking-[0.16em] text-cyan-100">SEGUIMIENTO
+              OPERATIVO</span>
+            <div class="flex gap-3">
+              <div
+                class="flex mt-1 h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-solid border-slate-500 bg-slate-600">
+                <i class="pi pi-users text-lg text-slate-100"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-extrabold tracking-tight text-slate-100 md:text-2xl">
+                  Monitoreo de Denuncias / Reclamos
+                </h3>
+                <p class="mt-1 text-sm text-slate-300">
+                  Visualiza y gestiona las denuncias y reclamos presentados por los estudiantes.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -29,13 +31,13 @@
             @if (hasExecutedSearch()) {
             <span
               class="inline-flex items-center rounded-full border border-solid border-cyan-300 bg-cyan-100/90 px-2.5 py-0.5 text-sm font-semibold text-cyan-900">
-              Resultados: {{ filteredComplaints().length }}
+              Resultados: 15 registros
             </span>
             }
             <!-- <span
-              class="inline-flex items-center rounded-full border border-solid border-slate-500 bg-slate-700/70 px-2.5 py-0.5 text-sm font-semibold text-slate-100">
-              Total: {{ complaints().length }} Registros
-            </span> -->
+                    class="inline-flex items-center rounded-full border border-solid border-slate-500 bg-slate-700/70 px-2.5 py-0.5 text-sm font-semibold text-slate-100">
+                    Total: {{ complaints().length }} Registros
+                  </span> -->
           </div>
         </div>
       </header>
@@ -93,17 +95,21 @@
         @if (hasExecutedSearch()) {
         <!-- Filtros secundarios -->
         <div>
-          <div class="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+          <div
+            class="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
             <i class="pi pi-sliders-h text-slate-500"></i>
             <span>Refina los resultados</span>
             @if (selectedDateRange()?.[0] && selectedDateRange()?.[1]) {
-            <span class="inline-flex items-center gap-1 rounded-full border border-solid border-slate-200 bg-white px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-slate-600">
+            <span
+              class="inline-flex items-center gap-1 rounded-full border border-solid border-slate-200 bg-white px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-slate-600">
               <i class="pi pi-calendar text-[10px] text-slate-500"></i>
-              Periodo: {{ selectedDateRange()?.[0] | date: 'dd/MM/yyyy' }} - {{ selectedDateRange()?.[1] | date: 'dd/MM/yyyy' }}
+              Periodo: {{ selectedDateRange()?.[0] | date: 'dd/MM/yyyy' }} - {{ selectedDateRange()?.[1] | date:
+              'dd/MM/yyyy' }}
             </span>
             }
             @if (searchTerm().trim()) {
-            <span class="inline-flex items-center gap-1 rounded-full border border-solid border-cyan-200 bg-cyan-50 px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-cyan-800">
+            <span
+              class="inline-flex items-center gap-1 rounded-full border border-solid border-cyan-200 bg-cyan-50 px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-cyan-800">
               <i class="pi pi-search text-[10px] text-cyan-700"></i>
               Búsqueda: "{{ searchTerm().trim() }}"
             </span>
@@ -112,38 +118,38 @@
 
           <div>
             <div class="flex flex-col gap-4 xl:flex-row xl:flex-wrap xl:items-center">
-            <div class="flex flex-wrap items-center gap-3 xl:flex-1">
-              <div class="w-full min-w-0 sm:w-[180px]">
-                <p-select
-                  class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                  [options]="tipoOptions" optionLabel="label" optionValue="value" [showClear]="true"
-                  placeholder="Tipo de usuario" [ngModel]="selectedTipoUsuario()"
-                  (ngModelChange)="selectedTipoUsuario.set($event)">
-                </p-select>
+              <div class="flex flex-wrap items-center gap-3 xl:flex-1">
+                <div class="w-full min-w-0 sm:w-[180px]">
+                  <p-select
+                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    [options]="tipoOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                    placeholder="Tipo de usuario" [ngModel]="selectedTipoUsuario()"
+                    (ngModelChange)="selectedTipoUsuario.set($event)">
+                  </p-select>
+                </div>
+
+                <div class="w-full min-w-0 sm:w-[180px]">
+                  <p-select
+                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                    placeholder="Estado" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
+                  </p-select>
+                </div>
+
+                <div class="w-full min-w-0 sm:w-[180px]">
+                  <p-select
+                    class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
+                    [options]="priorityOptions" optionLabel="label" optionValue="value" [showClear]="true"
+                    placeholder="Prioridad" [ngModel]="selectedPriority()"
+                    (ngModelChange)="selectedPriority.set($event)">
+                  </p-select>
+                </div>
               </div>
 
-              <div class="w-full min-w-0 sm:w-[180px]">
-                <p-select
-                  class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                  [options]="statusOptions" optionLabel="label" optionValue="value" [showClear]="true"
-                  placeholder="Estado" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event)">
-                </p-select>
-              </div>
-
-              <div class="w-full min-w-0 sm:w-[180px]">
-                <p-select
-                  class="w-full border border-solid border-gray-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-200/60"
-                  [options]="priorityOptions" optionLabel="label" optionValue="value" [showClear]="true"
-                  placeholder="Prioridad" [ngModel]="selectedPriority()"
-                  (ngModelChange)="selectedPriority.set($event)">
-                </p-select>
-              </div>
-            </div>
-
-            <p-button label="Nueva búsqueda" icon="pi pi-refresh" severity="info" size="small"
-              styleClass="!bg-cyan-600 !border-cyan-600 hover:!bg-cyan-700 hover:!border-cyan-700"
-              (onClick)="nuevaBusqueda()">
-            </p-button>
+              <p-button label="Nueva búsqueda" icon="pi pi-refresh" severity="info" size="small"
+                styleClass="!bg-cyan-600 !border-cyan-600 hover:!bg-cyan-700 hover:!border-cyan-700"
+                (onClick)="nuevaBusqueda()">
+              </p-button>
             </div>
           </div>
         </div>
@@ -168,8 +174,8 @@
       <div class="overflow-hidden rounded-2xl border border-solid border-slate-200 bg-white">
         <p-table [value]="filteredComplaints()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
           [totalRecords]="filteredComplaints().length" [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-          [scrollable]="true" scrollHeight="36rem" styleClass="gestion-results-table p-datatable-sm p-datatable-striped">
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" [scrollable]="true"
+          scrollHeight="36rem" styleClass="gestion-results-table p-datatable-sm p-datatable-striped">
 
           <ng-template pTemplate="colgroup">
             <colgroup>
@@ -276,7 +282,7 @@
                     <div class="text-sm font-medium text-slate-900">
                       {{ complaint.nombre }} {{ complaint.apellidos }}
                     </div>
-                    <div class="mt-1 text-xs text-slate-500" [title]="complaint.email || 'Sin correo'">
+                    <div class="mt-1 text-[10px] text-slate-500" [title]="complaint.email || 'Sin correo'">
                       <span class="hidden xl:inline">{{ complaint.email || 'Sin correo' }}</span>
                       <span class="xl:hidden">{{ getCompactEmail(complaint.email) }}</span>
                     </div>
@@ -366,8 +372,8 @@
                   </p-button>
 
                   <p-button icon="pi pi-history" severity="secondary" size="small" [raised]="true"
-                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900" pTooltip="Historial"
-                    tooltipPosition="top" (onClick)="verHistorialComplaint(complaint)">
+                    class="bg-white text-slate-700 shadow-none transition hover:bg-slate-50 hover:text-slate-900"
+                    pTooltip="Historial" tooltipPosition="top" (onClick)="verHistorialComplaint(complaint)">
                   </p-button>
                 </div>
               </td>
