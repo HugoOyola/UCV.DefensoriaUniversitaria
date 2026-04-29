@@ -20,51 +20,16 @@ export const environment = {
 				name: 'authjwt',
 				user: '',
 				pass: '',
-				tokenUrl: 'https://trilceapi2.ucv.edu.pe:8243/token?grant_type=client_credentials',
+				tokenUrl: 'https://ucvapi.azure-api.net/jwttrilce/v1/api/Token/Login',
 			},
 			routes: {
 				ejemplo: {
-					url: 'https://trilceapi2.ucv.edu.pe:8243/ejemplo/pr/api/',
+					url: 'https://trilceapi.ucv.edu.pe:8243/ejemplo/pr/api/',
 					...routes.ejemplo,
 				},
 				defensoriaUniversitaria: {
-					url: 'https://ucvapi.azure-api.net/defensoriaUniversitaria/v2/api/',
+					url: 'https://ucvapi.azure-api.net/defensoriaUniversitaria/v1/api/',
 					...routes.defensoriaUniversitaria,
-				},
-			},
-		},
-		trilceapi2: {
-			token: {
-				name: 'trilceapi2',
-				user: 'og5xgX458yx8pDVB5UpWgNabxL8a',
-				pass: '7RluNM9ox3T1UR7xOv0EONCo4Nka',
-				tokenUrl: 'https://trilceapi2.ucv.edu.pe:8243/token?grant_type=client_credentials',
-			},
-			routes: {
-				TrilcePrincipalApi: {
-					...routes.TrilcePrincipalApi,
-					// ...routes.IncidenciaApi
-				},
-				IncidenciaApi: {
-					...routes.IncidenciaApi
-				},
-				DefensoriaUniversitariaApi: {
-					...routes.DefensoriaUniversitariaApi,
-				},
-			},
-		},
-	},
-	ls_apis1: {
-		trilceapi2: {
-			token: {
-				name: 'trilceapi2',
-				user: 'og5xgX458yx8pDVB5UpWgNabxL8a',
-				pass: '7RluNM9ox3T1UR7xOv0EONCo4Nka',
-				tokenUrl: 'https://trilceapi2.ucv.edu.pe:8243/token?grant_type=client_credentials',
-			},
-			routes: {
-				IncidenciaApi: {
-					...routes.IncidenciaApi
 				},
 			},
 		},
